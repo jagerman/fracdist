@@ -17,6 +17,18 @@ http://qed.econ.queensu.ca/jae/datasets/mackinnon004/
 This program requires the GNU Scientific Library, and requires perl and CMake
 to compile.
 
+## Building
+
+From the project root, do:
+
+$ mkdir build
+$ cd build
+$ cmake ..
+$ make
+
+If all goes well, you'll now have fdpval and fdcrit executables and a
+libfracdist.so shared library.
+
 ## Author
 
 Jason Rhinelander <jason@imaginary.ca>
