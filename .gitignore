@@ -1,0 +1,10 @@
+# vim swap files
+.*.swp
+.swp
+.*.swo
+.swo
+
+# Build files
+/build/
+/build[0-9]/
+/*-build/
