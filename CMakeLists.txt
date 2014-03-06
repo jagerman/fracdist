@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.8)
 
-project(fracdist)
+project(fracdist C)
 
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/Modules)
 find_package(Perl REQUIRED)
@@ -17,8 +17,8 @@ include(MacroEnsureOutOfSourceBuild)
 macro_ensure_out_of_source_build("${PROJECT_NAME} requires an out-of-source build.  Create a build directory and run 'cmake ${CMAKE_SOURCE_DIR} [options]'.")
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
-set(CMAKE_CXX_FLAGS "-O3 -Wall -Wextra ${CMAKE_CXX_FLAGS}")
-set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0")
+set(CMAKE_C_FLAGS "-O3 -Wall -Wextra ${CMAKE_CXX_FLAGS} -std=c99")
+set(CMAKE_C_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0")
 
 file(GLOB fracdist_datafiles data/*.txt)
 
