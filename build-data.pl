@@ -42,6 +42,12 @@ my $header = qq!#pragma once
  */
 #define fracdist_p_length $pvalues
 
+/** The smallest b value in the data (and thus the largest supported) */
+#define fracdist_b_min fracdist_bvalues[0]
+
+/** The largest b value in the data (and thus the largest supported) */
+#define fracdist_b_max fracdist_bvalues[fracdist_b_length-1]
+
 /** The bvalues: `fracdist_bvalues[j]' is the b value corresponding to the quantiles contained in
  * `fracdist_q_const[i][j]'
  */
