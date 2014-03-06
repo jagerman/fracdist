@@ -1,5 +1,5 @@
 /** @file fdpval.c
- * @brief Takes test stat, q value, b value, and constant (1 or 0), outputs a p-value.
+ * @brief Takes q value, b value, constant (1 or 0), and test stats, outputs p-values.
  *
  * If any invalid arguments are provided, a help message is written to stderr and the program exits
  * with a non-zero status.
@@ -30,11 +30,12 @@ int help(const char *arg0) {
 "C indicates whether the model has a constant or not.  0, F, or FALSE indicate\n"
 "no constant; 1, T, or TRUE indicate a constant.\n\n"
 
-"T values are the test statistics for which you wish to calculate a p-value.  All standard\n"
-"floating point values are accepted (e.g. 1.2, 4.5e-3, etc.).  At least one test statistic is\n"
-"required.\n\n"
+"T values are the test statistics for which you wish to calculate a p-value.\n"
+"All standard floating point values are accepted (e.g. 1.2, 4.5e-3, etc.).  At\n"
+"least one test statistic is required, an all T values must be >= 0.\n\n"
 
-"P-values will be output one-per-line in the same order as given test statistics.\n\n",
+"P-values will be output one-per-line in the same order as the given values of\n"
+"T.\n\n",
 
     arg0, fracdist_q_length, fracdist_bvalues[0], fracdist_bvalues[fracdist_b_length-1]);
     return 2;
@@ -81,6 +82,9 @@ int main(int argc, char *argv[]) {
             scanned = sscanf(argv[4+i], "%lg%ln", &tests[i], &pos);
             if (scanned == EOF || pos < strlen(argv[4+i])) {
                 return ERROR("Invalid test statistic ``%s''", argv[4+i]);
+            }
+            if (tests[i] < 0) {
+                return ERROR("Invalid test statistic ``%s'': test statistics must be >= 0", argv[4+i]);
             }
         }
     }

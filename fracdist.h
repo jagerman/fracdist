@@ -19,7 +19,9 @@ enum fracdist_error {
     /** Error for invalid interpolation value */
     fracdist_error_interpolation,
     /** Error for invalid number of approximation points */
-    fracdist_error_approx_points
+    fracdist_error_approx_points,
+    /** Error code for some unknown error (if this occurs, there's a bug in the program) */
+    fracdist_error_unknown
 };
 
 /** Returns when returning a double.  .error will be 0 if the calculation was successful, to a
@@ -68,12 +70,11 @@ enum fracdist_interpolation {
  *     fracdist_pvalue_advanced(test_stat, q, b, constant, fracdist_interpolate_JGMMON14, 9)
  *
  * Returns the following error codes:
- * - 0: no error (.result holds the desired pvalue)
+ * - 0 (= fracdist_success): no error (.result holds the desired pvalue)
  * - fracdist_error_bvalue: b value is not supported (i.e. outside [0.51, 2])
  * - fracdist_error_qvalue: q value is not supported (i.e. outside [1, 12])
- * - fracdist_error_interpolation: fracdist_interpolation is set to something invalid/unsupported
  */
-fracdist_result fracdist_pvalue(double test_stat, unsigned int q, double b, bool constant);
+fracdist_result fracdist_pvalue(const double test_stat, const unsigned int q, const double b, const bool constant);
 
 /** Like fracdist_pvalue, but requires an interpolation mode and number of P-value approximation
  * points.  `approx_points' must be at least 3 (and depending on the test_stat and parameters, might
@@ -85,20 +86,56 @@ fracdist_result fracdist_pvalue(double test_stat, unsigned int q, double b, bool
  * \sa fracdist_pvalue
  *
  * In addition to the codes mentioned by fracdist_pvalue, this can return error codes:
+ * - fracdist_error_interpolation: fracdist_interpolation is set to something invalid/unsupported
  * - fracdist_error_approx_points - invalid number of approximation points.  This will be triggered
  *   if there are fewer than 3 admissable points (which will happen with `approx_points=5' for
  *   test_stats closest to those associated with limit p-values (0.0001 and 0.9999).  Thus, while
  *   `approx_points' of 3 or 4 may work for some `test_stat' values, 5 is the minimum value that
  *   never results in this error.
  */
-fracdist_result fracdist_pvalue_advanced(double test_stat, unsigned int q, double b, bool constant,
-        enum fracdist_interpolation interp_mode, unsigned int approx_points);
+fracdist_result fracdist_pvalue_advanced(const double test_stat, const unsigned int q, const double b, const bool constant,
+        const enum fracdist_interpolation interp_mode, const unsigned int approx_points);
 
 /** Calculates a critical value for a given level of the test.  Takes the level, q value, b value,
  * and whether the model contains a constant (0 for no constant, anything else for constant).
  *
  * Returns the following error codes:
- * - 0: no error: .result holds the desired critical value
+ * - 0 (= fracdist_success): no error (.result holds the desired pvalue)
+ * - fracdist_error_bvalue: b value is not supported (i.e. outside [0.51, 2])
+ * - fracdist_error_qvalue: q value is not supported (i.e. outside [1, 12])
  */
-fracdist_result fracdist_critical(double test_level, unsigned int q, double b, bool constant);
+fracdist_result fracdist_critical(const double test_level, const unsigned int q, const double b, const bool constant);
+
+/** Like fracdist_critical, but also takes an interpolation mode and number of P-value approximation
+ * points.  `approx_points' must be at least 3 (and depending on the test_stat and parameters, might
+ * need to be at least 5).
+ *
+ * Note that for values near the limit of the data (i.e. with pvalues close to 0 or 1), fewer points
+ * will be used in the approximation (as only points out the the data limits can be used).
+ *
+ * \sa fracdist_critical
+ *
+ * In addition to the codes mentioned by fracdist_critical, this can return error codes:
+ * - fracdist_error_interpolation: fracdist_interpolation is set to something invalid/unsupported
+ * - fracdist_error_approx_points - invalid number of approximation points.  This will be triggered
+ *   if there are fewer than 3 admissable points (which will happen with `approx_points=5' for p
+ *   values close to the limits of the data (0.0001 and 0.9999).  Thus, while `approx_points' of 3
+ *   or 4 may work for some `test_stat' values, 5 is the minimum value that never results in this
+ *   error.
+ */
+fracdist_result fracdist_critical_advanced(double test_level, const unsigned int q, const double b, const bool constant,
+        const enum fracdist_interpolation interp_mode, const unsigned int approx_points);
+
+/** Takes q, b, constant, and interpolation mode values and calculates the quantiles for the given
+ * values.  If anything is invalid, error_code_ is set to the appropriate error code and a null
+ * pointer is returned.  Otherwise, returns a array pointer of length fracdist_p_length containing
+ * the quantiles.  The pointer must be passed to free() once no longer necessary!
+ *
+ * The result of the previous call is cached so that calling fracdist_get_quantiles a second time
+ * with the same q, b, constant, and interp values will not reperform the necessary calculations.
+ *
+ * This function is mainly used for internal use by the other functions in this file, but may be
+ * useful for other purposes.
+ */
+const double* fracdist_get_quantiles(const unsigned int q, const double b, const bool constant, const enum fracdist_interpolation interp);
 
