@@ -1,4 +1,5 @@
 #pragma once
+#include <stdbool.h>
 #include "fracdist-data.h"
 
 /** @file fracdist.h
@@ -72,7 +73,7 @@ enum fracdist_interpolation {
  * - fracdist_error_qvalue: q value is not supported (i.e. outside [1, 12])
  * - fracdist_error_interpolation: fracdist_interpolation is set to something invalid/unsupported
  */
-fracdist_result fracdist_pvalue(double test_stat, unsigned int q, double b, unsigned char constant);
+fracdist_result fracdist_pvalue(double test_stat, unsigned int q, double b, bool constant);
 
 /** Like fracdist_pvalue, but requires an interpolation mode and number of P-value approximation
  * points.  `approx_points' must be at least 3 (and depending on the test_stat and parameters, might
@@ -90,7 +91,7 @@ fracdist_result fracdist_pvalue(double test_stat, unsigned int q, double b, unsi
  *   `approx_points' of 3 or 4 may work for some `test_stat' values, 5 is the minimum value that
  *   never results in this error.
  */
-fracdist_result fracdist_pvalue_advanced(double test_stat, unsigned int q, double b, unsigned char constant,
+fracdist_result fracdist_pvalue_advanced(double test_stat, unsigned int q, double b, bool constant,
         enum fracdist_interpolation interp_mode, unsigned int approx_points);
 
 /** Calculates a critical value for a given level of the test.  Takes the level, q value, b value,
@@ -99,5 +100,5 @@ fracdist_result fracdist_pvalue_advanced(double test_stat, unsigned int q, doubl
  * Returns the following error codes:
  * - 0: no error: .result holds the desired critical value
  */
-fracdist_result fracdist_critical(double test_level, unsigned int q, double b, unsigned char constant);
+fracdist_result fracdist_critical(double test_level, unsigned int q, double b, bool constant);
 

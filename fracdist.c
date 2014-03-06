@@ -1,6 +1,5 @@
 #include "fracdist.h"
 #include <stddef.h>
-#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -33,7 +32,7 @@ static enum fracdist_error error_code_;
  *
  * The `interpolation' parameter must be one of the following values:
  */
-static double* get_quantiles(unsigned int q, double b, unsigned char constant, enum fracdist_interpolation interp) {
+static double* get_quantiles(unsigned int q, double b, bool constant, enum fracdist_interpolation interp) {
     error_code_ = fracdist_success;
     if (q < 1 || q > fracdist_q_length) {
         error_code_ = fracdist_error_qvalue;
@@ -176,11 +175,11 @@ double inv_chisq(double p, double df) {
     return gsl_cdf_chisq_Pinv(p, df);
 }
 
-fracdist_result fracdist_pvalue(double test_stat, unsigned int q, double b, unsigned char constant) {
+fracdist_result fracdist_pvalue(double test_stat, unsigned int q, double b, bool constant) {
     return fracdist_pvalue_advanced(test_stat, q, b, constant, fracdist_interpolate_JGMMON14, 9);
 }
 
-fracdist_result fracdist_pvalue_advanced(double test_stat, unsigned int q, double b, unsigned char constant,
+fracdist_result fracdist_pvalue_advanced(double test_stat, unsigned int q, double b, bool constant,
         enum fracdist_interpolation interp_mode, unsigned int approx_points) {
     // Check that we didn't get passed a nonsensical number of approximation points
     if (approx_points < 3 || approx_points > fracdist_p_length) return FDR_ERROR(fracdist_error_approx_points);
