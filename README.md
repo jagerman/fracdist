@@ -19,15 +19,7 @@ to compile.
 
 ## Building
 
-From the project root, do:
-
-$ mkdir build
-$ cd build
-$ cmake ..
-$ make
-
-If all goes well, you'll now have fdpval and fdcrit executables and a
-libfracdist.so shared library.
+See [COMPILING](BUILDING.md).
 
 ## Author
 
