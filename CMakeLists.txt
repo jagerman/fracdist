@@ -52,14 +52,19 @@ set(CPACK_PACKAGE_VERSION_MAJOR ${fracdist_VMAJ})
 set(CPACK_PACKAGE_VERSION_MINOR ${fracdist_VMIN})
 set(CPACK_PACKAGE_VERSION_PATCH ${fracdist_VPAT})
 
+set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_SOURCE_DIR}/LICENSE")
+
 if (CMAKE_SYSTEM_NAME STREQUAL Windows)
+    # Windows users are scared of version numbers:
+    set(CPACK_PACKAGE_INSTALL_DIRECTORY "fracdist")
+
     install(TARGETS fracdist ${fd_execs} DESTINATION .)
     install(
         FILES fracdist.h "${CMAKE_BINARY_DIR}/fracdist-data.h"
         "${CMAKE_BINARY_DIR}/gsl/bin/libgsl-0.dll" "${CMAKE_BINARY_DIR}/gsl/bin/libgslcblas-0.dll"
         DESTINATION .)
 
-    set(CPACK_GENERATOR ZIP)
+    set(CPACK_GENERATOR ZIP NSIS)
     set(CPACK_PACKAGE_FILE_NAME "fracdist-${fracdist_VMAJ}.${fracdist_VMIN}.${fracdist_VPAT}-windows")
 else()
     install(TARGETS fracdist ${fd_execs} LIBRARY DESTINATION lib RUNTIME DESTINATION bin)
