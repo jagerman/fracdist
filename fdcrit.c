@@ -10,9 +10,8 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
-#include <strings.h>
 #include "fracdist.h"
+#include "parse-vals.h"
 
 #define HELP help(argv[0])
 #define ERROR(fmt, ...) error_with_help(fmt, argv[0], ##__VA_ARGS__)
@@ -57,35 +56,18 @@ int main(int argc, char *argv[]) {
     unsigned int q;
     bool constant;
     if (argc >= 5) {
+        int fail;
         num_levels = argc-4;
         levels = (double*) malloc(sizeof(double) * num_levels);
-        unsigned long pos;
-        int scanned;
-        scanned = sscanf(argv[1], "%u%ln", &q, &pos);
-        if (scanned == EOF || pos < strlen(argv[1]) || q < 1 || q > fracdist_q_length) {
-            return ERROR("Invalid q value ``%s''", argv[1]);
-        }
-        scanned = sscanf(argv[2], "%lg%ln", &b, &pos);
-        if (scanned == EOF || pos < strlen(argv[2]) || b < fracdist_b_min || b > fracdist_b_max) {
-            return ERROR("Invalid b value ``%s''", argv[2]);
-        }
-        if (!strcmp("1", argv[3]) || !strcasecmp("TRUE", argv[3]) || !strcasecmp("T", argv[3])) {
-            constant = true;
-        }
-        else if (!strcmp("0", argv[3]) || !strcasecmp("FALSE", argv[3]) || !strcasecmp("F", argv[3])) {
-            constant = false;
-        }
-        else {
-            return ERROR("Invalid constant value ``%s''", argv[3]);
-        }
+
+        PARSE_Q_B_C;
+
         for (size_t i = 0; i < num_levels; i++) {
-            scanned = sscanf(argv[4+i], "%lg%ln", &levels[i], &pos);
-            if (scanned == EOF || pos < strlen(argv[4+i])) {
-                return ERROR("Invalid test level ``%s''", argv[4+i]);
-            }
-            if (levels[i] < 0 || levels[i] > 1) {
+            fail = parse_double(argv[4+i], &levels[i]);
+            if (fail)
+                return ERROR("Invalid test statistic ``%s''", argv[4+i]);
+            if (levels[i] < 0 || levels[i] > 1)
                 return ERROR("Invalid test level ``%s'': value must be between 0 and 1", argv[4+i]);
-            }
         }
     }
     else {
@@ -96,7 +78,10 @@ int main(int argc, char *argv[]) {
     for (size_t i = 0; i < num_levels; i++) {
         fracdist_result r = fracdist_critical(levels[i], q, b, constant);
         if (!r.error) {
-            printf("%.6f\n", r.result);
+            if (isinf(r.result))
+                printf("inf\n");
+            else
+                printf("%.7g\n", r.result);
         }
         else {
             // We shouldn't really get here as the argument checking above should have caught these

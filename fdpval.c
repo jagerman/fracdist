@@ -10,9 +10,8 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
-#include <strings.h>
 #include "fracdist.h"
+#include "parse-vals.h"
 
 #define HELP help(argv[0])
 #define ERROR(fmt, ...) error_with_help(fmt, argv[0], ##__VA_ARGS__)
@@ -31,8 +30,8 @@ int help(const char *arg0) {
 "no constant; 1, T, or TRUE indicate a constant.\n\n"
 
 "T values are the test statistics for which you wish to calculate a p-value.\n"
-"All standard floating point values are accepted (e.g. 1.2, 4.5e-3, etc.).  At\n"
-"least one test statistic is required, an all T values must be >= 0.\n\n"
+"All standard floating point values are accepted (e.g. 1.2, 4.5e-3, inf, etc.).\n"
+"At least one test statistic is required, an all T values must be >= 0.\n\n"
 
 "P-values will be output one-per-line in the same order as the given values of\n"
 "T.\n\n",
@@ -57,35 +56,18 @@ int main(int argc, char *argv[]) {
     unsigned int q;
     bool constant;
     if (argc >= 5) {
+        int fail;
         num_tests = argc-4;
         tests = (double*) malloc(sizeof(double) * num_tests);
-        unsigned long pos;
-        int scanned;
-        scanned = sscanf(argv[1], "%u%ln", &q, &pos);
-        if (scanned == EOF || pos < strlen(argv[1]) || q < 1 || q > fracdist_q_length) {
-            return ERROR("Invalid q value ``%s''", argv[1]);
-        }
-        scanned = sscanf(argv[2], "%lg%ln", &b, &pos);
-        if (scanned == EOF || pos < strlen(argv[2]) || b < fracdist_b_min || b > fracdist_b_max) {
-            return ERROR("Invalid b value ``%s''", argv[2]);
-        }
-        if (!strcmp("1", argv[3]) || !strcasecmp("TRUE", argv[3]) || !strcasecmp("T", argv[3])) {
-            constant = true;
-        }
-        else if (!strcmp("0", argv[3]) || !strcasecmp("FALSE", argv[3]) || !strcasecmp("F", argv[3])) {
-            constant = false;
-        }
-        else {
-            return ERROR("Invalid constant value ``%s''", argv[3]);
-        }
+
+        PARSE_Q_B_C;
+
         for (size_t i = 0; i < num_tests; i++) {
-            scanned = sscanf(argv[4+i], "%lg%ln", &tests[i], &pos);
-            if (scanned == EOF || pos < strlen(argv[4+i])) {
+            fail = parse_double(argv[4+i], &tests[i]);
+            if (fail)
                 return ERROR("Invalid test statistic ``%s''", argv[4+i]);
-            }
-            if (tests[i] < 0) {
+            if (tests[i] < 0)
                 return ERROR("Invalid test statistic ``%s'': test statistics must be >= 0", argv[4+i]);
-            }
         }
     }
     else {
@@ -96,7 +78,7 @@ int main(int argc, char *argv[]) {
     for (size_t i = 0; i < num_tests; i++) {
         fracdist_result r = fracdist_pvalue(tests[i], q, b, constant);
         if (!r.error) {
-            printf("%.6f\n", r.result);
+            printf("%.7g\n", r.result);
         }
         else {
             // We shouldn't really get here as the argument checking above should have caught these
