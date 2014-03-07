@@ -16,6 +16,10 @@ enum fracdist_error {
     fracdist_error_bvalue,
     /** Error for invalid `q' value (i.e. outside [1, 12]) */
     fracdist_error_qvalue,
+    /** Error for requesting a critical value for an invalid p-value (i.e. outside [0,1]) */
+    fracdist_error_pvalue,
+    /** Error for requesting a pvalue for an invalid critical value (i.e. < 0) */
+    fracdist_error_teststat,
     /** Error for invalid interpolation value */
     fracdist_error_interpolation,
     /** Error for invalid number of approximation points */
@@ -73,6 +77,7 @@ enum fracdist_interpolation {
  * - 0 (= fracdist_success): no error (.result holds the desired pvalue)
  * - fracdist_error_bvalue: b value is not supported (i.e. outside [0.51, 2])
  * - fracdist_error_qvalue: q value is not supported (i.e. outside [1, 12])
+ * - fracdist_error_teststat: test stat is invalid (i.e. < 0)
  */
 fracdist_result fracdist_pvalue(const double test_stat, const unsigned int q, const double b, const bool constant);
 
@@ -103,6 +108,7 @@ fracdist_result fracdist_pvalue_advanced(const double test_stat, const unsigned 
  * - 0 (= fracdist_success): no error (.result holds the desired pvalue)
  * - fracdist_error_bvalue: b value is not supported (i.e. outside [0.51, 2])
  * - fracdist_error_qvalue: q value is not supported (i.e. outside [1, 12])
+ * - fracdist_error_pvalue: test level is not a valid p-value (i.e. outside [0, 1])
  */
 fracdist_result fracdist_critical(const double test_level, const unsigned int q, const double b, const bool constant);
 

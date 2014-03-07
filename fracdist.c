@@ -277,6 +277,14 @@ fracdist_result fracdist_pvalue(const double test_stat, const unsigned int q, co
 fracdist_result fracdist_pvalue_advanced(const double test_stat, const unsigned int q, const double b, const bool constant,
         const enum fracdist_interpolation interp_mode, const unsigned int approx_points) {
 
+    if (test_stat < 0)
+        return ERROR(fracdist_error_teststat);
+    // The critical values for test stats of 0 or infinity are trivial: 1 or 0.
+    if (test_stat == 0)
+        return SUCCESS(1);
+    if (isinf(test_stat))
+        return SUCCESS(0);
+
     // First get the set of quantiles to use (this also checks and q and b are valid):
     const double *quantiles = fracdist_get_quantiles(q, b, constant, interp_mode);
 
@@ -352,6 +360,14 @@ fracdist_result fracdist_critical_advanced(double test_level, const unsigned int
 
     // Take 1 minus the level to make it comparable to our stored p-values
     test_level = 1 - test_level;
+
+    if (test_level < 0 || test_level > 1)
+        return ERROR(fracdist_error_pvalue);
+    // The critical values for test levels of 0 or 1 are trivial: 0 or infinity.
+    if (test_level == 0)
+        return SUCCESS(0);
+    if (test_level == 1)
+        return SUCCESS(INFINITY);
 
     // First get the set of quantiles to use (this also checks and q and b are valid):
     const double *quantiles = fracdist_get_quantiles(q, b, constant, interp_mode);
