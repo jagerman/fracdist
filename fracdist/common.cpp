@@ -1,5 +1,4 @@
 #include <fracdist/common.hpp>
-#include <boost/format.hpp>
 #include <boost/math/distributions/chi_squared.hpp>
 #include <Eigen/Core>
 #include <Eigen/LU>
@@ -34,10 +33,10 @@ const std::array<double, p_length> quantiles(const unsigned int &q, const double
     }
 
     if (q < 1 || q > q_length)
-        throw std::out_of_range((boost::format("q value (%1%) invalid: q must between 1 and %2%") % q % 1 % q_length).str());
+        throw std::out_of_range(ostringstream() << "q value (" << q << ") invalid: q must between 1 and " << q_length);
     const double bmin = bvalues.front(), bmax = bvalues.back();
     if (b < bmin || b > bmax)
-        throw std::out_of_range((boost::format("b value (%1%) invalid: b must be between %|.3| and %|.3|") % b % bmin % bmax).str());
+        throw std::out_of_range(ostringstream() << "b value (" << b << ") invalid: b must be between " << bmin << " and " << bmax);
 
     // Set bmap to an alias into the q-specific b arrays
     const std::array<const std::array<double, p_length>, b_length> &bmap = constant ? q_const[q-1] : q_noconst[q-1];
@@ -134,7 +133,7 @@ const std::array<double, p_length> quantiles(const unsigned int &q, const double
         // We want to get the fitted value for wantx, in other words, wantx * beta.  Expanding beta,
         // we get wantx * (X^T X)^-1 X^T y.  The only thing actually as we go through the data is y,
         // so we can just precompute most of the above.  fitter here will actually just be a vector.
-        auto fitter = wantx * (Xt * X).inverse() * Xt;
+        auto fitter = (wantx * (Xt * X).inverse() * Xt).eval();
 
         VectorXd y(blast-bfirst+1);
 
