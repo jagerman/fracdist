@@ -12,7 +12,7 @@
 #include <cstdlib>
 #include <vector>
 #include <fracdist/pvalue.hpp>
-#include "parse-vals.h"
+#include "parse-vals.hpp"
 
 #define HELP help(argv[0])
 #define ERROR(fmt, ...) error_with_help(fmt, argv[0], ##__VA_ARGS__)

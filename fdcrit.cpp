@@ -12,7 +12,7 @@
 #include <cstdlib>
 #include <vector>
 #include <fracdist/critical.hpp>
-#include "parse-vals.h"
+#include "parse-vals.hpp"
 #include <iostream>
 
 #define HELP help(argv[0])
