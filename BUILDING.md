@@ -23,6 +23,13 @@ or alternatively build a .deb and .rpm package to install using one of:
 followed by an appropriate package command to install the package (for example,
 on Debian/Ubuntu: dpkg -i fracdist-x.y.z-amd64.deb).
 
+You can also use either of:
+
+    make package
+    cpack
+
+to build both the .deb and .rpm.
+
 ## Windows executables (built on a Linux system using mingw)
 
 Requirements:
@@ -46,3 +53,8 @@ or, for an exe installer:
     cpack -G NSIS
 
 (Requires that nsis be installed).
+
+You can build both at once using either:
+
+    make package
+    cpack
