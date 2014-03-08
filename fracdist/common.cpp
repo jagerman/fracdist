@@ -4,7 +4,9 @@
 #include <Eigen/Core>
 #include <Eigen/LU>
 
-using namespace Eigen;
+using Eigen::MatrixX3d;
+using Eigen::VectorXd;
+using Eigen::RowVector3d;
 
 namespace fracdist {
 

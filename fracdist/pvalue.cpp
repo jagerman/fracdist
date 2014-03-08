@@ -1,10 +1,11 @@
 #include <fracdist/pvalue.hpp>
-#include <boost/format.hpp>
 #include <boost/math/distributions/chi_squared.hpp>
 #include <Eigen/Core>
 #include <Eigen/LU>
 
-using namespace Eigen;
+using Eigen::MatrixX3d;
+using Eigen::VectorXd;
+using Eigen::RowVector3d;
 
 namespace fracdist {
 
@@ -18,11 +19,11 @@ double pvalue_advanced(const double &test_stat, const unsigned int &q, const dou
         const interpolation &interp_mode, const unsigned int &approx_points) {
 
     if (test_stat < 0)
-        throw std::out_of_range((boost::format("test stat (%1%) invalid: cannot be negative") % test_stat).str());
+        throw std::out_of_range(ostringstream() << "test stat (" << test_stat << ") invalid: cannot be negative");
     // The critical values for test stats of 0 or infinity are trivial: 1 or 0.
     if (test_stat == 0)
         return 1.0;
-    if (isinf(test_stat))
+    if (std::isinf(test_stat))
         return 0.0;
 
     // First get the set of quantiles to use (this also checks and q and b are valid):
@@ -42,7 +43,7 @@ double pvalue_advanced(const double &test_stat, const unsigned int &q, const dou
     auto ap = find_bracket(min_at, p_length-1, approx_points);
 
     if (ap.second - ap.first < 2)
-        throw std::runtime_error((boost::format("approx_points (%1%) too small: not enough data points for quadratic approximation") % approx_points).str());
+        throw std::runtime_error(ostringstream() << "approx_points (" << approx_points << ") too small: not enough data points for quadratic approximation");
 
     // Now we're going to run the regression:
     // 

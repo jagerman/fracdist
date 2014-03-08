@@ -87,7 +87,7 @@ int main(int argc, char *argv[]) {
             return ERROR("An error occured: %s", e.what());
         }
 
-        if (isinf(r))
+        if (std::isinf(r))
             printf("inf\n");
         else
             printf("%.7g\n", r);

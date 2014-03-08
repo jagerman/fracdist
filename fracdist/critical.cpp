@@ -1,10 +1,13 @@
 #include <fracdist/critical.hpp>
 #include <boost/math/distributions/chi_squared.hpp>
-#include <boost/format.hpp>
+#include <sstream>
 #include <Eigen/Core>
 #include <Eigen/LU>
 
-using namespace Eigen;
+using Eigen::MatrixX3d;
+using Eigen::VectorXd;
+using Eigen::RowVector3d;
+
 namespace fracdist {
 
 double critical(const double &test_level, const unsigned int &q, const double &b, const bool &constant) {
@@ -18,7 +21,7 @@ double critical_advanced(double test_level, const unsigned int &q, const double 
     test_level = 1 - test_level;
 
     if (test_level < 0 || test_level > 1)
-        throw std::out_of_range((boost::format("test level (%1%) invalid: must be between 0 and 1") % test_level).str());
+        throw std::out_of_range(ostringstream() << "test level (" << test_level << ") invalid: must be between 0 and 1");
     // The critical values for test levels of 0 or 1 are trivial: 0 or infinity.
     if (test_level == 0) return 0.0;
     if (test_level == 1) return INFINITY;
@@ -37,7 +40,7 @@ double critical_advanced(double test_level, const unsigned int &q, const double 
     auto ap = find_bracket(min_at, p_length-1, approx_points);
 
     if (ap.second - ap.first < 2)
-        throw std::runtime_error((boost::format("approx_points (%1%) too small: not enough data points for quadratic approximation") % approx_points).str());
+        throw std::runtime_error(ostringstream() << "approx_points (" << approx_points << ") too small: not enough data points for quadratic approximation");
 
     // Now we're going to estimate the regression:
     // 

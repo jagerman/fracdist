@@ -2,6 +2,7 @@
 #include <array>
 #include <fracdist/data.hpp>
 #include <cmath>
+#include <sstream>
 
 namespace fracdist {
 
@@ -85,5 +86,20 @@ std::pair<size_t, size_t> find_bracket(const size_t &center, const size_t &max, 
  * very fast.
  */
 double chisq_inv_p_i(const size_t &pval_index, const unsigned int &q);
+
+/** Wrapper object around std::ostringstream that overrides << and is castable to a std::string so
+ * that a construction like:
+ *
+ *     somethingrequiringastring(fdstringstream() << "a" << "b")
+ *
+ * is valid without requiring the caller to store an intermediate ostringstream object.
+ */
+class ostringstream : public std::ostringstream {
+    public:
+        ostringstream() : std::ostringstream() {}
+        template <typename T> ostringstream& operator<<(const T &v) { std::ostringstream::operator<<(v); return *this; }
+        operator std::string() const { return str(); }
+};
+
 
 }
