@@ -14,12 +14,17 @@ http://qed.econ.queensu.ca/jae/datasets/mackinnon004/
 
 ## Requirements
 
-This program requires perl, CMake, Eigen3 and Boost to compile, but has no
-special runtime requirements.
+This program requires CMake and perl to compile.  It also requires a C++
+compiler supporting the C++11 standard (recent versions of clang and g++
+will certainly work).
+
+It also uses Eigen3 and Boost, but includes copies of these libraries for
+systems that do not have them (locally installed versions will be used instead
+of the included versions, if found).
 
 ## Building
 
-See [COMPILING](BUILDING.md).
+See [BUILDING.md](BUILDING.md).
 
 ## Author
 
