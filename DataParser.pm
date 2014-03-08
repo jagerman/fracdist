@@ -32,7 +32,7 @@ sub parse_files {
         open my $fh, "<", $filename
             or die "Unable to open $filename: $!\n";
 
-        $result .= "\t{ // q=$_:\n";
+        $result .= "\t{{ // q=$_:\n";
         my @bvalues;
         my $bvalpos = 0;
         my $line = <$fh>;
@@ -53,7 +53,7 @@ sub parse_files {
             ++$bvalpos;
             $result .= "\t\t// b=$b:\n\t\t";
             # Store a buffer of the next line here, wrap it when it hits $LINE_WRAP in length
-            my $out = "{";
+            my $out = "{{";
 
             my $pvaluepos = 0;
             my @newpvalues;
@@ -100,12 +100,12 @@ sub parse_files {
 
             # Flush anything left in the out buffer, then end the current data structure
             $out =~ s/,$//;
-            # We're going to add two characters, which might push us over the line wrap; if so,
+            # We're going to add three characters, which might push us over the line wrap; if so,
             # rewrap the last value
-            if (length($out) > $LINE_WRAP - 10) {
+            if (length($out) > $LINE_WRAP - 11) {
                 $out =~ s/,(?=[^,]+$)/,\n\t\t/;
             }
-            $result .= "$out},\n";
+            $result .= "$out}},\n";
 
             if (not defined $line or $line eq '') {
                 # Hit the end of the file or end of the data
@@ -128,7 +128,7 @@ sub parse_files {
         # Chop off the last comma
         $result =~ s/,$//;
 
-        $result .= "\t},\n";
+        $result .= "\t}},\n";
     }
 
     # Chop off the last comma

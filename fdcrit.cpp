@@ -5,13 +5,15 @@
  * with a non-zero status.
  *
  * This is a simple wrapper around the fracdist_critical call and does not support the alternative
- * functionality available through fracdist_critical_advanced().
+ * functionality available through fracdist::critical_advanced().
  */
-#include <stdarg.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include "fracdist.h"
+#include <cstdarg>
+#include <cstdio>
+#include <cstdlib>
+#include <vector>
+#include <fracdist/critical.hpp>
 #include "parse-vals.h"
+#include <iostream>
 
 #define HELP help(argv[0])
 #define ERROR(fmt, ...) error_with_help(fmt, argv[0], ##__VA_ARGS__)
@@ -22,7 +24,7 @@ int help(const char *arg0) {
 "Usage: %s Q B C P [P ...]\n\n"
 "Estimates a p-value for the test statistic(s) T.\n\n"
 
-"Q is the q value, which must be an integer between 1 and %d, inclusive.\n\n"
+"Q is the q value, which must be an integer between 1 and %zd, inclusive.\n\n"
 
 "B is the b value, which must be a double between %.3f and %.3f.\n\n"
 
@@ -36,7 +38,7 @@ int help(const char *arg0) {
 "Critical values will be output one-per-line in the same order as the given\n"
 "values of P\n\n",
 
-    arg0, fracdist_q_length, fracdist_bvalues[0], fracdist_bvalues[fracdist_b_length-1]);
+    arg0, fracdist::q_length, fracdist::bvalues.front(), fracdist::bvalues.back());
     return 2;
 }
 
@@ -51,23 +53,25 @@ int error_with_help(const char *errfmt, const char* arg0, ...) {
 }
 
 int main(int argc, char *argv[]) {
-    double b, *levels;
+    double b;
+    std::vector<double> levels;
     size_t num_levels;
     unsigned int q;
     bool constant;
     if (argc >= 5) {
         int fail;
         num_levels = argc-4;
-        levels = (double*) malloc(sizeof(double) * num_levels);
 
         PARSE_Q_B_C;
 
         for (size_t i = 0; i < num_levels; i++) {
-            fail = parse_double(argv[4+i], &levels[i]);
+            double d;
+            fail = parse_double(argv[4+i], d);
             if (fail)
-                return ERROR("Invalid test statistic ``%s''", argv[4+i]);
-            if (levels[i] < 0 || levels[i] > 1)
+                return ERROR("Invalid test level ``%s''", argv[4+i]);
+            if (d < 0 || d > 1)
                 return ERROR("Invalid test level ``%s'': value must be between 0 and 1", argv[4+i]);
+            levels.push_back(d);
         }
     }
     else {
@@ -75,21 +79,17 @@ int main(int argc, char *argv[]) {
     }
 
 
-    for (size_t i = 0; i < num_levels; i++) {
-        fracdist_result r = fracdist_critical(levels[i], q, b, constant);
-        if (!r.error) {
-            if (isinf(r.result))
-                printf("inf\n");
-            else
-                printf("%.7g\n", r.result);
+    for (auto &d : levels) {
+        double r;
+        try {
+            r = fracdist::critical(d, q, b, constant);
+        } catch (std::exception &e) {
+            return ERROR("An error occured: %s", e.what());
         }
-        else {
-            // We shouldn't really get here as the argument checking above should have caught these
-            if (r.error == fracdist_error_bvalue)
-                return ERROR("Invalid b value `%.6f'", b);
-            if (r.error == fracdist_error_qvalue)
-                return ERROR("Invalid q value `%d'", q);
-            return ERROR("An unknown error occurred");
-        }
+
+        if (isinf(r))
+            printf("inf\n");
+        else
+            printf("%.7g\n", r);
     }
 }

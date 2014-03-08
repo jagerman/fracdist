@@ -14,8 +14,8 @@ http://qed.econ.queensu.ca/jae/datasets/mackinnon004/
 
 ## Requirements
 
-This program requires the GNU Scientific Library, and requires perl and CMake
-to compile.
+This program requires perl, CMake, Eigen3 and Boost to compile, but has no
+special runtime requirements.
 
 ## Building
 

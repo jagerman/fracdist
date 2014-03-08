@@ -7,10 +7,11 @@
  * This is a simple wrapper around the fracdist_pvalue call and does not support the alternative
  * functionality available through fracdist_pvalue_advanced().
  */
-#include <stdarg.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include "fracdist.h"
+#include <cstdarg>
+#include <cstdio>
+#include <cstdlib>
+#include <vector>
+#include <fracdist/pvalue.hpp>
 #include "parse-vals.h"
 
 #define HELP help(argv[0])
@@ -22,7 +23,7 @@ int help(const char *arg0) {
 "Usage: %s Q B C T [T ...]\n\n"
 "Estimates a p-value for the test statistic(s) T.\n\n"
 
-"Q is the q value, which must be an integer between 1 and %d, inclusive.\n\n"
+"Q is the q value, which must be an integer between 1 and %zd, inclusive.\n\n"
 
 "B is the b value, which must be a double between %.3f and %.3f.\n\n"
 
@@ -36,7 +37,7 @@ int help(const char *arg0) {
 "P-values will be output one-per-line in the same order as the given values of\n"
 "T.\n\n",
 
-    arg0, fracdist_q_length, fracdist_bvalues[0], fracdist_bvalues[fracdist_b_length-1]);
+    arg0, fracdist::q_length, fracdist::bvalues.front(), fracdist::bvalues.back());
     return 2;
 }
 
@@ -51,23 +52,26 @@ int error_with_help(const char *errfmt, const char* arg0, ...) {
 }
 
 int main(int argc, char *argv[]) {
-    double b, *tests;
+    double b;
+    std::vector<double> tests;
     size_t num_tests;
     unsigned int q;
     bool constant;
+
     if (argc >= 5) {
         int fail;
         num_tests = argc-4;
-        tests = (double*) malloc(sizeof(double) * num_tests);
 
         PARSE_Q_B_C;
 
         for (size_t i = 0; i < num_tests; i++) {
-            fail = parse_double(argv[4+i], &tests[i]);
+            double d;
+            fail = parse_double(argv[4+i], d);
             if (fail)
                 return ERROR("Invalid test statistic ``%s''", argv[4+i]);
-            if (tests[i] < 0)
-                return ERROR("Invalid test statistic ``%s'': test statistics must be >= 0", argv[4+i]);
+            if (d < 0)
+                return ERROR("Invalid test statistic ``%s'': value must be >= 0", argv[4+i]);
+            tests.push_back(d);
         }
     }
     else {
@@ -76,17 +80,13 @@ int main(int argc, char *argv[]) {
 
 
     for (size_t i = 0; i < num_tests; i++) {
-        fracdist_result r = fracdist_pvalue(tests[i], q, b, constant);
-        if (!r.error) {
-            printf("%.7g\n", r.result);
+        double r;
+        try {
+            r = fracdist::pvalue(tests[i], q, b, constant);
+        } catch (std::exception &e) {
+            return ERROR("An error occured: %s", e.what());
         }
-        else {
-            // We shouldn't really get here as the argument checking above should have caught these
-            if (r.error == fracdist_error_bvalue)
-                return ERROR("Invalid b value `%.6f'", b);
-            if (r.error == fracdist_error_qvalue)
-                return ERROR("Invalid q value `%d'", q);
-            return ERROR("An unknown error occurred");
-        }
+
+        printf("%.7g\n", r);
     }
 }
