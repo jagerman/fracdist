@@ -103,6 +103,10 @@ foreach(exec ${fracdist_programs})
     target_link_libraries(${exec} fracdist)
 endforeach()
 
+
+add_subdirectory(doc EXCLUDE_FROM_ALL)
+
+
 set(CPACK_PACKAGE_VERSION_MAJOR ${fracdist_VMAJ})
 set(CPACK_PACKAGE_VERSION_MINOR ${fracdist_VMIN})
 set(CPACK_PACKAGE_VERSION_PATCH ${fracdist_VPAT})
