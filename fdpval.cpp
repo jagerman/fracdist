@@ -1,4 +1,4 @@
-/** @file fdpval.c
+/** @file fdpval.cpp
  * @brief Takes q value, b value, constant (1 or 0), and test stats, outputs p-values.
  *
  * If any invalid arguments are provided, a help message is written to stderr and the program exits

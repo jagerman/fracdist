@@ -175,7 +175,7 @@ std::pair<size_t, size_t> find_bracket(const size_t &center, const size_t &max, 
 unsigned int chisq_inv_cache_q = 0;
 std::array<double, p_length> chisq_inv_cache;
 boost::math::chi_squared_distribution<double> chisq_dist(1);
-/* Returns the inverse chi squared cdf at `pvalues[pval_index]' with q^2 degrees of freedom.  The
+/** Returns the inverse chi squared cdf at `pvalues[pval_index]` with q^2 degrees of freedom.  The
  * value is cached (so long as q doesn't change) so that subsequent calls for the same value are
  * very fast.
  */

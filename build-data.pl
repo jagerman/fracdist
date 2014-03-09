@@ -35,32 +35,36 @@ my $header = qq!#pragma once
 namespace fracdist {
 
 constexpr size_t
+    /// The number of `q` values (from 1 to $DataParser::NUM_Q) in fracdist::q_const and fracdist::q_noconst.
     q_length = $DataParser::NUM_Q,
+    /// The number of `b` values in fracdist::bvalues.  `b_length == bvalues.size()` will be true.
     b_length = $bvalues,
+    /** The number of probability values and associated quantiles in `fracdist::pvalues`,
+     * `fracdist::q_const[i][j]`, and `fracdist::q_noconst[i][j]` (for any admissable `i` and `j`). */
     p_length = $pvalues;
 
 
-/** The bvalues: `bvalues[j]' is the b value corresponding to the quantiles contained in
- * `q_const[i][j]'
+/** The bvalues: `bvalues[j]` is the b value corresponding to the quantiles contained in
+ * `fracdist::q_const[i][j]`
  */
 extern const std::array<double, b_length> bvalues;
 
-/** The pvalues; `pvalues[k]' is the pvalue associated with quantile
- * `q_const[i][j][k]'
+/** The pvalues; `pvalues[k]` is the pvalue associated with quantile
+ * `fracdist::q_const[i][j][k]`
  */
 extern const std::array<double, p_length> pvalues;
 
-/** A double[][][] (wrapped in std::array's) where double[x][y][z] corresponds to the quantile with
-`q=z+1', `b=bvalues[y]', and `pval=pvalues[z]'.  For example, if `bvalues[5] == 0.75' and
-`pvalues[20] == 0.05' then `quantiles[3][5][20]' is the 0.05 quantile * for q=4, b=0.75.  This
-variable is for models estimated with a constant.
+/** A `double[][][]` (wrapped in nested `std::array`) where `q_const[x][y][z]` corresponds to the quantile with
+\\f\$q = z+1\\f\$, \\f\$b={}\\f\$`fracdist::bvalues[y]`, and \\f\$p={}\\f\$`fracdist::pvalues[z]`.  For example, if `bvalues[5] == 0.75` and
+`pvalues[20] == 0.05` then `q_const[3][5][20]` is the 0.05 quantile for \\f\$q=4, b=0.75\\f\$ for a model with a constant.  This
+variable is for models estimated *with* a constant.
 */
 extern const std::array<const std::array<const std::array<double, p_length>, b_length>, q_length> q_const;
 
-/** A double[][][] (wrapped in std::array's) where double[x][y][z] corresponds to the quantile with
-`q=z+1', `b=bvalues[y]', and `pval=pvalues[z]'.  For example, if `bvalues[5] == 0.75' and
-`pvalues[20] == 0.05' then `quantiles[3][5][20]' is the 0.05 quantile for q=4, b=0.75.  This
-variable is for models estimated without a constant.
+/** A `double[][][]` (wrapped in nested `std::array`) where `q_noconst[x][y][z]` corresponds to the quantile with
+\\f\$q = z+1\\f\$, \\f\$b={}\\f\$`fracdist::bvalues[y]`, and \\f\$p={}\\f\$`fracdist::pvalues[z]`.  For example, if `bvalues[5] == 0.75` and
+`pvalues[20] == 0.05` then `q_noconst[3][5][20]` is the 0.05 quantile for \\f\$q=4, b=0.75\\f\$ for a model without a constant.  This
+variable is for models estimated *without* a constant.
 */
 extern const std::array<const std::array<const std::array<double, p_length>, b_length>, q_length> q_noconst;
 
