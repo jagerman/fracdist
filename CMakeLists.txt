@@ -110,7 +110,7 @@ if (NOT DEFINED fracdist_PACKAGE_DOCS)
         message(STATUS "doxygen found: enabling documentation generation")
         set(fracdist_PACKAGE_DOCS 1)
     else()
-        message(STATUS "doxygen not found: documentation generation disabled")
+        message(WARNING "doxygen not found: documentation generation and packaging disabled")
     endif()
 endif()
 
