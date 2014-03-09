@@ -9,7 +9,14 @@ using Eigen::RowVector3d;
 
 namespace fracdist {
 
-QCache qcache = { .cached = false };
+// Caches the quantiles calculated in the last quantiles call.  If get_quantiles is called with
+// the same q, b, constant, and interpolation values, we can simple return the cached
+// value.
+struct {
+    bool cached; // False initially; will be set to true when populated
+    bool constant; unsigned int q; double b; interpolation interp; // Parameters the cache was calculated for
+    std::array<double, p_length> cache;
+} qcache = { .cached = false };
 
 // Updates qcache
 static void qcache_store(const unsigned int &q, const double &b, const bool &constant, const interpolation &interp, const std::array<double, p_length> &quantiles) {
@@ -85,7 +92,7 @@ const std::array<double, p_length> quantiles(const unsigned int &q, const double
 
     if (interp == interpolation::linear) {
         if (first_gt == 0 || first_gt == (size_t) -1) // Neither of these should be possible, but be defensive
-            throw std::out_of_range((boost::format("b value (%1%) invalid: b must be between %|.3| and %|.3|") % b % bmin % bmax).str());
+            throw std::out_of_range(ostringstream() << "b value (" << b << ") invalid: b must be between " << bmin << " and " << bmax);
 
         // The weight to put on first_gt-1 (1 minus this is the weight for first_gt):
         const double w0 = (bvalues[first_gt] - b) / (bvalues[first_gt] - bvalues[first_gt-1]);
@@ -100,7 +107,7 @@ const std::array<double, p_length> quantiles(const unsigned int &q, const double
     else if (need_weights) {
         // We can't compute the regression if we don't have at least three values:
         if (blast - bfirst < 2)
-            throw std::runtime_error((boost::format("b value (%1%) unsupported: not enough data points for quadratic approximation") % b).str());
+            throw std::runtime_error(ostringstream() << "b value (" << b << ") unsupported: not enough data points for quadratic approximation");
 
         // This follows MacKinnon and Nielsen (2014) which calculated quantiles using a fitted quadratic
         // of nearby points.

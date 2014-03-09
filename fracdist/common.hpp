@@ -45,15 +45,6 @@ enum class interpolation {
  */
 const std::array<double, p_length> quantiles(const unsigned int &q, const double &b, const bool &constant, const interpolation &interp);
 
-// Caches the quantiles calculated in the last quantiles call.  If get_quantiles is called with
-// the same q, b, constant, and interpolation values, we can simple return the cached
-// value.
-struct QCache {
-    bool cached; // False initially; will be set to true when populated
-    bool constant; unsigned int q; double b; interpolation interp; // Parameters the cache was calculated for
-    std::array<double, p_length> cache;
-};
-
 /** Takes a value and array and returns the index of the array value closest to the given value.
  * In the event of a tie, the lower index is returned.
  */
