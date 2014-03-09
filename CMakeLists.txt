@@ -5,6 +5,14 @@ project(fracdist CXX)
 set(fracdist_VMAJ 1)
 set(fracdist_VMIN 0)
 set(fracdist_VPAT 0)
+set(fracdist_description "fractional unit roots/cointegration pvalue and critical value finder")
+set(fracdist_author "Jason Rhinelander <jason@imaginary.ca>")
+set(fracdist_homepage "https://github.com/jagerman/fracdist")
+
+set(fracdist_data_zip_basename mn-files.zip)
+set(fracdist_data_zip "${CMAKE_CURRENT_BINARY_DIR}/data/${fracdist_data_zip_basename}")
+set(fracdist_data_url "http://qed.econ.queensu.ca/jae/datasets/mackinnon004/${fracdist_data_zip_basename}")
+set(fracdist_data_generated "${CMAKE_BINARY_DIR}/fracdist/data.cpp" "${CMAKE_BINARY_DIR}/fracdist/data.hpp")
 
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/Modules)
 find_package(Perl REQUIRED)
@@ -28,19 +36,45 @@ if (MINGW)
     add_definitions(-DBOOST_DISABLE_THREADS)
 endif()
 
+message(STATUS "Downloading ${fracdist_data_url}...")
+file(DOWNLOAD "${fracdist_data_url}" "${fracdist_data_zip}" STATUS zipdl_stat EXPECTED_MD5 "d9033e3f941aed5c7ccf5f5ce2756b79")
 
-file(GLOB fracdist_datafiles data/*.txt)
-set(fracdist_headers fracdist/common.hpp fracdist/pvalue.hpp fracdist/critical.hpp)
-set(fracdist_header_data "${CMAKE_BINARY_DIR}/fracdist/data.hpp")
-set(fracdist_source fracdist/pvalue.cpp fracdist/critical.cpp fracdist/common.cpp fracdist/data.cpp)
+list(GET zipdl_stat 0 errcode)
+if (errcode)
+    list(GET zipdl_stat 1 errmsg)
+    message(FATAL_ERROR "Unable to download data files from ${fracdist_data_url}: ${errmsg}")
+endif()
+message(STATUS "${fracdist_data_zip} downloaded.")
+
+foreach(type c m)
+    foreach (n RANGE 1 12)
+        if (n LESS 10)
+            set(n "0${n}")
+        endif()
+        list(APPEND fracdist_datafiles "${CMAKE_CURRENT_BINARY_DIR}/data/fr${type}app${n}.txt")
+    endforeach()
+endforeach()
+
+add_custom_command(OUTPUT ${fracdist_datafiles}
+    COMMAND ${CMAKE_COMMAND} -E tar xf "${fracdist_data_zip}"
+    COMMAND ${CMAKE_COMMAND} -E remove "${CMAKE_CURRENT_BINARY_DIR}/data/fracdist.f" "${CMAKE_CURRENT_BINARY_DIR}/data/fracdist.f-win"
+    WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/data"
+    COMMENT "Extracting data/frcapp*.txt, frmapp*.txt from ${fracdist_data_zip_basename}")
+
+foreach(hpp fracdist/common.hpp fracdist/pvalue.hpp fracdist/critical.hpp)
+    list(APPEND fracdist_headers "${CMAKE_CURRENT_SOURCE_DIR}/${hpp}")
+endforeach()
+foreach(cpp fracdist/pvalue.cpp fracdist/critical.cpp fracdist/common.cpp)
+    list(APPEND fracdist_source "${CMAKE_CURRENT_SOURCE_DIR}/${cpp}")
+endforeach()
 set(fracdist_programs fdpval fdcrit)
 
-add_custom_command(OUTPUT "${CMAKE_BINARY_DIR}/fracdist/data.cpp" "${CMAKE_BINARY_DIR}/fracdist/data.hpp"
-    COMMAND ${PERL_EXECUTABLE} "-I${CMAKE_SOURCE_DIR}" "${CMAKE_SOURCE_DIR}/build-data.pl" "${CMAKE_SOURCE_DIR}/data"
+add_custom_command(OUTPUT ${fracdist_data_generated}
+    COMMAND ${PERL_EXECUTABLE} "-I${CMAKE_SOURCE_DIR}" "${CMAKE_SOURCE_DIR}/build-data.pl" "${CMAKE_BINARY_DIR}/data"
     DEPENDS build-data.pl DataParser.pm ${fracdist_datafiles}
+    COMMENT "Generating fracdist/data.{cpp,hpp} from data/*.txt"
 )
-add_custom_target(data DEPENDS
-    "${CMAKE_BINARY_DIR}/fracdist/data.cpp" "${CMAKE_BINARY_DIR}/fracdist/data.hpp")
+add_custom_target(data DEPENDS ${fracdist_data_generated})
 
 # Try to find Eigen3 on the system first; if that fails, use the included copy
 find_package(Eigen3)
@@ -60,7 +94,7 @@ if (NOT Boost_FOUND)
 endif()
 include_directories(${Boost_INCLUDE_DIRS})
 
-add_library(fracdist SHARED ${fracdist_source})
+add_library(fracdist SHARED ${fracdist_source} "${CMAKE_BINARY_DIR}/fracdist/data.cpp")
 
 add_dependencies(fracdist data)
 
@@ -98,9 +132,10 @@ else()
         set(arch amd64)
     endif()
     set(CPACK_PACKAGE_FILE_NAME "fracdist-${fracdist_VMAJ}.${fracdist_VMIN}.${fracdist_VPAT}-${arch}")
-    set(CPACK_DEBIAN_PACKAGE_MAINTAINER "Jason Rhinelander <jason@imaginary.ca>")
+    set(CPACK_DEBIAN_PACKAGE_MAINTAINER "${fracdist_author}")
     set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
-    set(CPACK_DEBIAN_PACKAGE_HOMEPAGE "https://github.com/jagerman/fracdist")
-    set(CPACK_DEBIAN_PACKAGE_DESCRIPTION "fractional unit roots/cointegration pvalue and critical value finder")
+    set(CPACK_DEBIAN_PACKAGE_HOMEPAGE "${fracdist_homepage}")
+    set(CPACK_DEBIAN_PACKAGE_DESCRIPTION "${fracdist_description}")
 endif()
 include(CPack)
+
