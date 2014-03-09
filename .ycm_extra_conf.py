@@ -7,6 +7,7 @@ flags = [
         '-Werror',
         '-std=c++11',
         '-I', '.',
+        '-I', 'build',
         '-I', '/usr/include/eigen3'
         ]
 

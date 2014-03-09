@@ -103,8 +103,28 @@ foreach(exec ${fracdist_programs})
     target_link_libraries(${exec} fracdist)
 endforeach()
 
+# If fracdist_PACKAGE_DOCS is not set, include it only if doxygen is found
+if (NOT DEFINED fracdist_PACKAGE_DOCS)
+    find_package(Doxygen 1.8.2)
+    if (DOXYGEN_FOUND)
+        message(STATUS "doxygen found: enabling documentation generation")
+        set(fracdist_PACKAGE_DOCS 1)
+    else()
+        message(STATUS "doxygen not found: documentation generation disabled")
+    endif()
+endif()
 
-add_subdirectory(doc EXCLUDE_FROM_ALL)
+if (CMAKE_SYSTEM_NAME STREQUAL Windows)
+    set(fracdist_docdir "doc")
+else()
+    set(fracdist_docdir "share/doc/fracdist")
+endif()
+
+if (fracdist_PACKAGE_DOCS)
+    add_subdirectory(doc)
+else()
+    add_subdirectory(doc EXCLUDE_FROM_ALL)
+endif()
 
 
 set(CPACK_PACKAGE_VERSION_MAJOR ${fracdist_VMAJ})
