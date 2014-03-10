@@ -26,5 +26,4 @@ add_dependencies(api_doc ${fracdist_data_generated})
 
 install(DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/api"
     DESTINATION "${fracdist_docdir}"
-    COMPONENT doc)
-
+    COMPONENT docs)

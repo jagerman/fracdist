@@ -48,6 +48,10 @@ this program.  If not, see <http://www.gnu.org/licenses/>.
 
 See [BUILDING.md](BUILDING.md).
 
+## Changes
+
+See [CHANGELOG.md](CHANGELOG.md).
+
 ## Author
 
 [Jason Rhinelander](Jason Rhinelander) <jason@imaginary.ca>

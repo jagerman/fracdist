@@ -4,7 +4,7 @@ project(fracdist CXX)
 
 set(fracdist_VMAJ 1)
 set(fracdist_VMIN 0)
-set(fracdist_VPAT 0)
+set(fracdist_VPAT 1)
 set(fracdist_description "fractional unit roots/cointegration pvalue and critical value finder")
 set(fracdist_author "Jason Rhinelander <jason@imaginary.ca>")
 set(fracdist_homepage "https://github.com/jagerman/fracdist")
@@ -64,6 +64,7 @@ add_custom_command(OUTPUT ${fracdist_datafiles}
 foreach(hpp fracdist/common.hpp fracdist/pvalue.hpp fracdist/critical.hpp)
     list(APPEND fracdist_headers "${CMAKE_CURRENT_SOURCE_DIR}/${hpp}")
 endforeach()
+list(APPEND fracdist_headers "${CMAKE_CURRENT_BINARY_DIR}/fracdist/data.hpp")
 foreach(cpp fracdist/pvalue.cpp fracdist/critical.cpp fracdist/common.cpp)
     list(APPEND fracdist_source "${CMAKE_CURRENT_SOURCE_DIR}/${cpp}")
 endforeach()
@@ -134,20 +135,23 @@ set(CPACK_PACKAGE_VERSION_PATCH ${fracdist_VPAT})
 set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_SOURCE_DIR}/LICENSE")
 
 
+install(FILES ${fracdist_headers} DESTINATION include/fracdist COMPONENT headers)
+
+install(FILES README.md CHANGELOG.md DESTINATION "${fracdist_docdir}" COMPONENT docs)
+
 if (CMAKE_SYSTEM_NAME STREQUAL Windows)
     # Windows users are scared of version numbers:
     set(CPACK_PACKAGE_INSTALL_DIRECTORY "fracdist")
 
-    install(TARGETS fracdist ${fracdist_programs} DESTINATION .)
-    install(
-        FILES ${fracdist_headers} ${fracdist_header_data}
-        DESTINATION include/fracdist)
+    # Windows binaries and lib go in the top-level dir:
+    install(TARGETS ${fracdist_programs} COMPONENT binaries DESTINATION .)
+    install(TARGETS fracdist COMPONENT library DESTINATION .)
 
     set(CPACK_GENERATOR ZIP NSIS)
     set(CPACK_PACKAGE_FILE_NAME "fracdist-${fracdist_VMAJ}.${fracdist_VMIN}.${fracdist_VPAT}-windows")
 else()
-    install(TARGETS fracdist ${fracdist_programs} LIBRARY DESTINATION lib RUNTIME DESTINATION bin)
-    install(FILES ${fracdist_headers} DESTINATION include)
+    install(TARGETS fracdist COMPONENT library DESTINATION lib)
+    install(TARGETS ${fracdist_programs} COMPONENT binaries DESTINATION bin)
 
     set(CPACK_GENERATOR DEB RPM)
 
@@ -161,5 +165,13 @@ else()
     set(CPACK_DEBIAN_PACKAGE_HOMEPAGE "${fracdist_homepage}")
     set(CPACK_DEBIAN_PACKAGE_DESCRIPTION "${fracdist_description}")
 endif()
+
+set(CPACK_COMPONENTS_GROUPING ALL_COMPONENTS_IN_ONE)
+
 include(CPack)
+
+cpack_add_component(library REQUIRED DISPLAY_NAME "libfracdist" DESCRIPTION "The main fracdist library code.")
+cpack_add_component(binaries DISPLAY_NAME "Binaries" DESCRIPTION "'fdpval' and 'fdcrit' provide a simple command-line interface to libfracdist functionality.")
+cpack_add_component(headers DISABLED DISPLAY_NAME "C++ headers" DESCRIPTION "C++ headers needed to compile code linking to libfracdist.")
+cpack_add_component(docs DISABLED DISPLAY_NAME "Documentation" DESCRIPTION "API documentation for libfracdist programming.")
 
