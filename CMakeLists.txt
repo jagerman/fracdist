@@ -4,10 +4,24 @@ project(fracdist CXX)
 
 set(fracdist_VMAJ 1)
 set(fracdist_VMIN 0)
-set(fracdist_VPAT 1)
+set(fracdist_VPAT 2)
 set(fracdist_description "fractional unit roots/cointegration pvalue and critical value finder")
 set(fracdist_author "Jason Rhinelander <jason@imaginary.ca>")
 set(fracdist_homepage "https://github.com/jagerman/fracdist")
+
+# libfracdist library version (CURRENT.AGE.REVISION), which is totally separate
+# from the above.
+# CURRENT gets incremented for an incompatible interface change
+# AGE gets incremented for compatible-preserving interface changes/additions
+# REVISION gets incremented for code changes without interface changes
+set(libfracdist_CURRENT  "0")
+set(libfracdist_AGE      "0")
+set(libfracdist_REVISION "0")
+
+# The versions for the .so file; changes needed only for ABI-incompatible changes.
+set(libfracdist_so_VMAJ 1)
+set(libfracdist_so_VMIN 0)
+set(libfracdist_so_VPAT 0)
 
 set(fracdist_data_zip_basename mn-files.zip)
 set(fracdist_data_zip "${CMAKE_CURRENT_BINARY_DIR}/data/${fracdist_data_zip_basename}")
@@ -26,11 +40,7 @@ set(CMAKE_CXX_FLAGS "-O3 ${CMAKE_CXX_FLAGS} -std=c++11")
 set(CMAKE_CXX_FLAGS_DEBUG "-Wall -Wextra ${CMAKE_CXX_FLAGS_DEBUG} -O0")
 
 if (MINGW)
-    #add_definitions(-static-libgcc -static-libstdc++)
     # Link to libgcc/libstdc++ statically (so that we don't need to carry around the extra DLLs)
-    #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static-libgcc -static-libstdc++")
-    #    set(LINK_FLAGS "${LINK_FLAGS} -static-libgcc -static-libstdc++")
-    #    set(CMAKE_SHARED_LIBRARY_LINK_CXX_FLAGS "${CMAKE_SHARED_LIBRARY_LINK_CXX_FLAGS} -static-libgcc -static-libstdc++")
     set(CMAKE_EXE_LINKER_FLAGS "-static -Wl,--allow-multiple-definition")
     set(CMAKE_SHARED_LINKER_FLAGS "-static")
     add_definitions(-DBOOST_DISABLE_THREADS)
@@ -96,6 +106,10 @@ endif()
 include_directories(${Boost_INCLUDE_DIRS})
 
 add_library(fracdist SHARED ${fracdist_source} "${CMAKE_BINARY_DIR}/fracdist/data.cpp")
+set_target_properties(fracdist PROPERTIES
+    VERSION "${libfracdist_CURRENT}.${libfracdist_AGE}.${libfracdist_REVISION}"
+    SOVERSION "${libfracdist_CURRENT}"
+)
 
 add_dependencies(fracdist data)
 

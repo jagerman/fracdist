@@ -1,5 +1,9 @@
 # Major version changes (for change details, see https://github.com/jagerman/fracdist)
 
+## 1.0.2
+
+- Added versioning to libfracdist shared library.
+
 ## 1.0.1
 
 - Initial release binary packages were installing headers in the wrong place
