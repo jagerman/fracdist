@@ -152,9 +152,6 @@ install(FILES ${fracdist_headers} DESTINATION include/fracdist COMPONENT headers
 install(FILES README.md CHANGELOG.md DESTINATION "${fracdist_docdir}" COMPONENT docs)
 
 if (CMAKE_SYSTEM_NAME STREQUAL Windows)
-    # Windows users are scared of version numbers:
-    set(CPACK_PACKAGE_INSTALL_DIRECTORY "fracdist")
-
     # Windows binaries and lib go in the top-level dir:
     install(TARGETS ${fracdist_programs} COMPONENT binaries DESTINATION .)
     install(TARGETS fracdist COMPONENT library DESTINATION .)
@@ -169,8 +166,20 @@ else()
 
     set(arch ${CMAKE_HOST_SYSTEM_PROCESSOR})
     if (arch STREQUAL x86_64)
-        set(arch amd64)
+        # Check that we aren't using a 32-bit userspace
+        execute_process(COMMAND perl -MConfig -e "print \$Config{longsize}" OUTPUT_VARIABLE longsize)
+        if (longsize EQUAL 4)
+            set(arch i386)
+        else()
+            set(arch amd64)
+        endif()
+    elseif(arch STREQUAL x86)
+        set(arch i386)
+    elseif(arch MATCHES "i[3-6]86")
+        set(arch i386)
     endif()
+    message(STATUS "arch = ${arch}")
+
     set(CPACK_PACKAGE_FILE_NAME "fracdist-${fracdist_VMAJ}.${fracdist_VMIN}.${fracdist_VPAT}-${arch}")
     set(CPACK_DEBIAN_PACKAGE_MAINTAINER "${fracdist_author}")
     #set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
