@@ -29,9 +29,9 @@ at https://imaginary.ca/fracdist-api/.
 Binary releases of this program have no special requirements, and are available
 from https://github.com/jagerman/fracdist/releases.
 
-Compiling this program requires CMake, perl, and a C++ compiler supporting the
-C++11 standard (recent versions of clang and g++ will certainly work).  See
-[BUILDING.md](BUILDING.md) for details.
+Compiling this program requires a minimum of CMake, perl, and a C++ compiler
+supporting the C++11 standard (recent versions of clang and g++ will certainly
+work).  See [BUILDING.md](BUILDING.md) for more details.
 
 ## License
 
