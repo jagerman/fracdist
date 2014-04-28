@@ -135,10 +135,8 @@ else()
     set(fracdist_docdir "share/doc/fracdist")
 endif()
 
-if (fracdist_PACKAGE_DOCS)
+if (DEFINED fracdist_PACKAGE_DOCS)
     add_subdirectory(doc)
-else()
-    add_subdirectory(doc EXCLUDE_FROM_ALL)
 endif()
 
 
