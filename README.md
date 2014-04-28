@@ -12,6 +12,11 @@ and Cointegration Tests," *Journal of Applied Econometrics*, Vol. 29, No. 1,
 http://qed.econ.queensu.ca/jae/datasets/mackinnon004/, is automatically
 downloaded when compiling this software.
 
+This program consists of two command-line binaries: `fdpval` and `fdcrit`.  The
+former calculates p-values for test statistics, the latter calculates critical
+test statistic values from p-values.  Running each program without arguments
+gives usage information for the programs.
+
 The latest version of the source code of this library is available at
 https://github.com/jagerman/fracdist.  Binary releases are available at
 https://github.com/jagerman/fracdist/releases.
