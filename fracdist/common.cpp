@@ -1,11 +1,14 @@
 #include <fracdist/common.hpp>
 #include <boost/math/distributions/chi_squared.hpp>
 #include <Eigen/Core>
-#include <Eigen/LU>
+#include <Eigen/Cholesky>
 
 using Eigen::MatrixX3d;
+using Eigen::Matrix3Xd;
+using Eigen::Matrix3d;
 using Eigen::VectorXd;
 using Eigen::RowVector3d;
+using Eigen::LLT;
 
 namespace fracdist {
 
@@ -122,7 +125,8 @@ const std::array<double, p_length> quantiles(const unsigned int &q, const double
         // The interpolated F' is then the fitted value from the regression evaluted at the desired
         // b.
 
-        // The regressors don't change, so calculate the X matrix just once:
+        // The regressors don't change, so calculate the X and cholesky decomposition of XtX
+        // matrices just once:
         
         MatrixX3d X(blast-bfirst+1, 3);
         for (size_t i = bfirst; i <= blast; i++) {
@@ -131,16 +135,13 @@ const std::array<double, p_length> quantiles(const unsigned int &q, const double
             X(i-bfirst, 2) = bweights[i] * bvalues[i] * bvalues[i];
         }
 
+        Matrix3Xd Xt = X.transpose();
+        LLT<Matrix3d> cholXtX(Xt * X);
+
         RowVector3d wantx;
         wantx(0) = 1.0;
         wantx(1) = b;
         wantx(2) = b*b;
-        auto Xt = X.transpose();
-
-        // We want to get the fitted value for wantx, in other words, wantx * beta.  Expanding beta,
-        // we get wantx * (X^T X)^-1 X^T y.  The only thing actually as we go through the data is y,
-        // so we can just precompute most of the above.  fitter here will actually just be a vector.
-        auto fitter = (wantx * (Xt * X).inverse() * Xt).eval();
 
         VectorXd y(blast-bfirst+1);
 
@@ -151,7 +152,7 @@ const std::array<double, p_length> quantiles(const unsigned int &q, const double
                 y(j-bfirst) = bweights[j] * bmap[j][i];
             }
 
-            result[i] = fitter * y;
+            result[i] = wantx * cholXtX.solve(Xt * y);
         }
 
         qcache_store(q, b, constant, interp, result);

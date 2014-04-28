@@ -1,11 +1,14 @@
 #include <fracdist/pvalue.hpp>
 #include <boost/math/distributions/chi_squared.hpp>
 #include <Eigen/Core>
-#include <Eigen/LU>
+#include <Eigen/Cholesky>
 
+using Eigen::Matrix3d;
 using Eigen::MatrixX3d;
+using Eigen::Matrix3Xd;
 using Eigen::VectorXd;
 using Eigen::RowVector3d;
+using Eigen::LLT;
 
 namespace fracdist {
 
@@ -62,14 +65,14 @@ double pvalue_advanced(const double &test_stat, const unsigned int &q, const dou
 
         y(i-ap.first) = chisq_inv_p_i(i, q);
     }
-
     RowVector3d data;
     data(0) = 1.0;
     data(1) = test_stat;
     data(2) = test_stat*test_stat;
 
-    auto Xt = X.transpose();
-    double fitted = data * (((Xt * X).inverse()) * Xt * y);
+    Matrix3Xd Xt = X.transpose();
+    LLT<Matrix3d> cholXtX(Xt * X);
+    double fitted = data * cholXtX.solve(Xt * y);
 
     // A negative isn't valid, so if we predicted one anyway, truncate it at 0 (which corresponds to
     // a pvalue of 1).
