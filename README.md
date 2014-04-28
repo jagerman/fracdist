@@ -12,23 +12,21 @@ and Cointegration Tests," *Journal of Applied Econometrics*, Vol. 29, No. 1,
 http://qed.econ.queensu.ca/jae/datasets/mackinnon004/, is automatically
 downloaded when compiling this software.
 
-The latest version of this library is available at
-https://github.com/jagerman/fracdist.
+The latest version of the source code of this library is available at
+https://github.com/jagerman/fracdist.  Binary releases are available at
+https://github.com/jagerman/fracdist/releases.
 
 A generated version of the library API (which may be out of date) is available
 at https://imaginary.ca/fracdist-api/.
 
 ## Requirements
 
-This program requires CMake and perl to compile.  It also requires a C++
-compiler supporting the C++11 standard (recent versions of clang and g++
-will certainly work).
+Binary releases of this program have no special requirements, and are available
+from https://github.com/jagerman/fracdist/releases.
 
-It also uses Eigen3 and Boost, but includes copies of these libraries for
-systems that do not have them (locally installed versions will be used instead
-of the included versions, if found).
-
-Creating the library API documentation requires a working Doxygen installation.
+Compiling this program requires CMake, perl, and a C++ compiler supporting the
+C++11 standard (recent versions of clang and g++ will certainly work).  See
+[BUILDING.md](BUILDING.md) for details.
 
 ## License
 
