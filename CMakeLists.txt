@@ -47,7 +47,7 @@ if (MINGW)
 endif()
 
 message(STATUS "Downloading ${fracdist_data_url}...")
-file(DOWNLOAD "${fracdist_data_url}" "${fracdist_data_zip}" STATUS zipdl_stat EXPECTED_MD5 "d9033e3f941aed5c7ccf5f5ce2756b79")
+file(DOWNLOAD "${fracdist_data_url}" "${fracdist_data_zip}" STATUS zipdl_stat EXPECTED_MD5 "506e607bbabc99ba796bd80c766e8f27")
 
 list(GET zipdl_stat 0 errcode)
 if (errcode)
