@@ -4,7 +4,7 @@ project(fracdist CXX)
 
 set(fracdist_VMAJ 1)
 set(fracdist_VMIN 0)
-set(fracdist_VPAT 2)
+set(fracdist_VPAT 3)
 set(fracdist_description "fractional unit roots/cointegration pvalue and critical value finder")
 set(fracdist_author "Jason Rhinelander <jason@imaginary.ca>")
 set(fracdist_homepage "https://github.com/jagerman/fracdist")
@@ -47,7 +47,7 @@ if (MINGW)
 endif()
 
 message(STATUS "Downloading ${fracdist_data_url}...")
-file(DOWNLOAD "${fracdist_data_url}" "${fracdist_data_zip}" STATUS zipdl_stat EXPECTED_MD5 "506e607bbabc99ba796bd80c766e8f27")
+file(DOWNLOAD "${fracdist_data_url}" "${fracdist_data_zip}" STATUS zipdl_stat)
 
 list(GET zipdl_stat 0 errcode)
 if (errcode)
@@ -71,7 +71,7 @@ add_custom_command(OUTPUT ${fracdist_datafiles}
     WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/data"
     COMMENT "Extracting data/frcapp*.txt, frmapp*.txt from ${fracdist_data_zip_basename}")
 
-foreach(hpp fracdist/common.hpp fracdist/pvalue.hpp fracdist/critical.hpp)
+foreach(hpp fracdist/common.hpp fracdist/pvalue.hpp fracdist/critical.hpp fracdist/version.hpp)
     list(APPEND fracdist_headers "${CMAKE_CURRENT_SOURCE_DIR}/${hpp}")
 endforeach()
 list(APPEND fracdist_headers "${CMAKE_CURRENT_BINARY_DIR}/fracdist/data.hpp")
@@ -86,6 +86,9 @@ add_custom_command(OUTPUT ${fracdist_data_generated}
     COMMENT "Generating fracdist/data.{cpp,hpp} from data/*.txt"
 )
 add_custom_target(data DEPENDS ${fracdist_data_generated})
+
+configure_file("${CMAKE_SOURCE_DIR}/fracdist/version.cpp.in" "${CMAKE_BINARY_DIR}/fracdist/version.cpp")
+list(APPEND fracdist_source "${CMAKE_BINARY_DIR}/fracdist/version.cpp")
 
 # Try to find Eigen3 on the system first; if that fails, use the included copy
 find_package(Eigen3)

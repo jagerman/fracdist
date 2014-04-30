@@ -1,0 +1,10 @@
+#include <fracdist/version.hpp>
+
+namespace fracdist {
+
+const unsigned int version_major = @fracdist_VMAJ@;
+const unsigned int version_minor = @fracdist_VMIN@;
+const unsigned int version_patch = @fracdist_VPAT@;
+const char *version_string = "@fracdist_VMAJ@.@fracdist_VMIN@.@fracdist_VPAT@";
+
+}

@@ -1,5 +1,16 @@
 # Major version changes (for change details, see https://github.com/jagerman/fracdist)
 
+## 1.0.3
+
+- Added --linear flag to fdpval and fdcrit that uses linear B interpolation
+  between the two nearest dataset B values instead of the 5-9 nearest points
+  for a quadratic interpolation.
+- Added version and licence info to fdpval and fdcrit output
+- Added version variables to library (in fracdist/version.hpp, .cpp)
+- Removed md5sum check from mn-files.zip download; it broke every time the data
+  set download changed (from the recent fracdist.f fixes), making the package
+  unbuildable.
+
 ## 1.0.2
 
 - Added versioning to libfracdist shared library.

@@ -7,21 +7,13 @@
  * This is a simple wrapper around the fracdist_critical call and does not support the alternative
  * functionality available through fracdist::critical_advanced().
  */
-#include <cstdarg>
-#include <cstdio>
-#include <cstdlib>
-#include <vector>
 #include <fracdist/critical.hpp>
-#include "parse-vals.hpp"
-#include <iostream>
-
-#define HELP help(argv[0])
-#define ERROR(fmt, ...) error_with_help(fmt, argv[0], ##__VA_ARGS__)
+#include "cli-common.hpp"
 
 /** Prints a help message to stderr, returns 1 (to be returned by main()). */
 int help(const char *arg0) {
     fprintf(stderr, "\n"
-"Usage: %s Q B C P [P ...]\n\n"
+"Usage: %s Q B C P [P ...] [--linear|-l]\n\n"
 "Estimates a p-value for the test statistic(s) T.\n\n"
 
 "Q is the q value, which must be an integer between 1 and %zd, inclusive.\n\n"
@@ -36,55 +28,70 @@ int help(const char *arg0) {
 "least one test level is required, and all test levels must satisfy 0 <= P <= 1.\n\n"
 
 "Critical values will be output one-per-line in the same order as the given\n"
-"values of P\n\n",
+"values of P\n\n"
+
+"If the optional --linear (or -l) argument is given, linear interpolation of the\n"
+"two closest dataset B values is used and exact values are used for exact B\n"
+"value matches.  The default, when --linear is not given, uses a quadratic\n"
+"approximation of nearby B values (even when the value of B exactly matches the\n"
+"data set).\n\n",
 
     arg0, fracdist::q_length, fracdist::bvalues.front(), fracdist::bvalues.back());
+    print_version("fdcrit");
     return 2;
-}
-
-int error_with_help(const char *errfmt, const char* arg0, ...) {
-    va_list arg;
-    va_start(arg, arg0);
-    fprintf(stderr, "\n");
-    vfprintf(stderr, errfmt, arg);
-    va_end(arg);
-    help(arg0);
-    return 3;
 }
 
 int main(int argc, char *argv[]) {
     double b;
-    std::vector<double> levels;
-    size_t num_levels;
+    std::list<double> levels;
     unsigned int q;
     bool constant;
-    if (argc >= 5) {
-        int fail;
-        num_levels = argc-4;
+
+    std::list<std::string> args;
+    for (int i = 1; i < argc; i++) {
+        args.push_back(argv[i]);
+    }
+
+    if (arg_match(args, {"--help", "-h", "-?"}))
+        return help(argv[0]);
+    else if (arg_match(args, {"--version", "-v"}))
+        return print_version("fdcrit");
+
+    bool linear_interp = arg_remove(args, {"--linear", "-l"});
+
+    if (args.size() >= 4) {
+        bool success;
 
         PARSE_Q_B_C;
 
-        for (size_t i = 0; i < num_levels; i++) {
+        while (not args.empty()) {
+            std::string arg = args.front();
+            args.pop_front();
             double d;
-            fail = parse_double(argv[4+i], d);
-            if (fail)
-                return ERROR("Invalid test level ``%s''", argv[4+i]);
+            success = parse_double(arg.c_str(), d);
+            if (not success)
+                RETURN_ERROR("Invalid test level ``%s''", arg.c_str());
             if (d < 0 || d > 1)
-                return ERROR("Invalid test level ``%s'': value must be between 0 and 1", argv[4+i]);
+                RETURN_ERROR("Invalid test level ``%s'': value must be between 0 and 1", arg.c_str());
             levels.push_back(d);
         }
     }
-    else {
-        return ERROR("Invalid number of arguments");
-    }
 
+    // No arguments; output the help.
+    else if (args.empty()) {
+        return help(argv[0]);
+    }
+    else {
+        RETURN_ERROR("Invalid arguments");
+    }
 
     for (auto &d : levels) {
         double r;
         try {
-            r = fracdist::critical(d, q, b, constant);
+            r = fracdist::critical_advanced(d, q, b, constant,
+                    linear_interp ? fracdist::interpolation::linear : fracdist::interpolation::JGMMON14, 9);
         } catch (std::exception &e) {
-            return ERROR("An error occured: %s", e.what());
+            RETURN_ERROR("An error occured: %s", e.what());
         }
 
         if (std::isinf(r))
