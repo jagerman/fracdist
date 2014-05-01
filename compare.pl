@@ -11,6 +11,12 @@ use Cwd;
 use strict;
 use warnings;
 
+our $fdextra = "";
+# Run with --linear flag to pass it through to fdpval/fdcrit
+if (@ARGV and @ARGV == 1 and $ARGV[0] =~ /^(?:-l|--linear)$/) {
+    $fdextra = " --linear";
+}
+
 our $trials = 100;
 
 sub randvals {
@@ -57,8 +63,8 @@ our ($fdpval, $fdcrit);
 for my $path ($cwd, "$cwd/build", "$ENV{HOME}/dev/fracdist/build", "/usr/local/bin", "/usr/bin") {
     if (-f -r -x "$path/fdpval" and -f -r -x "$path/fdcrit") {
         print "Using fdpval and fdcrit from $path\n";
-        $fdpval = "$path/fdpval";
-        $fdcrit = "$path/fdcrit";
+        $fdpval = "$path/fdpval$fdextra";
+        $fdcrit = "$path/fdcrit$fdextra";
         last;
     }
 }
