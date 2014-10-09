@@ -9,6 +9,9 @@ set(fracdist_description "fractional unit roots/cointegration pvalue and critica
 set(fracdist_author "Jason Rhinelander <jason@imaginary.ca>")
 set(fracdist_homepage "https://github.com/jagerman/fracdist")
 
+cmake_policy(SET CMP0046 OLD)
+cmake_policy(SET CMP0042 NEW)
+
 # libfracdist library version (CURRENT.AGE.REVISION), which is totally separate
 # from the above.
 # CURRENT gets incremented for an incompatible interface change
@@ -161,6 +164,12 @@ if (CMAKE_SYSTEM_NAME STREQUAL Windows)
 
     set(CPACK_GENERATOR ZIP NSIS)
     set(CPACK_PACKAGE_FILE_NAME "fracdist-${fracdist_VMAJ}.${fracdist_VMIN}.${fracdist_VPAT}-windows")
+elseif(CMAKE_SYSTEM_NAME STREQUAL Darwin)
+    # This is a bit gross, but basically we'll just stick the binaries/so in the top-level:
+    install(TARGETS ${fracdist_programs} COMPONENT binaries DESTINATION .)
+    install(TARGETS fracdist COMPONENT library DESTINATION .)
+    set(CPACK_GENERATOR ZIP)
+    set(CPACK_PACKAGE_FILE_NAME "fracdist-${fracdist_VMAJ}.${fracdist_VMIN}.${fracdist_VPAT}-macosx")
 else()
     install(TARGETS fracdist COMPONENT library DESTINATION lib)
     install(TARGETS ${fracdist_programs} COMPONENT binaries DESTINATION bin)
