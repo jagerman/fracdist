@@ -2,14 +2,9 @@
 #include <boost/math/distributions/chi_squared.hpp>
 #include <sstream>
 #include <Eigen/Core>
-#include <Eigen/Cholesky>
+#include <Eigen/SVD>
 
-using Eigen::MatrixX3d;
-using Eigen::Matrix3Xd;
-using Eigen::Matrix3d;
-using Eigen::VectorXd;
-using Eigen::RowVector3d;
-using Eigen::LLT;
+using namespace Eigen;
 
 namespace fracdist {
 
@@ -73,9 +68,8 @@ double critical_advanced(double test_level, const unsigned int &q, const double 
     data(2) = chisqinv_actual*chisqinv_actual;
 
     // Get the fitted value from the regression using the inverse of our actual test level
-    Matrix3Xd Xt = X.transpose();
-    LLT<Matrix3d> cholXtX(Xt * X);
-    double fitted = data * cholXtX.solve(Xt * y);
+    JacobiSVD<MatrixXd> svd(X, ComputeThinU | ComputeThinV);
+    double fitted = data * svd.solve(y);
 
     // Negative critical values are impossible; if we somehow got a negative prediction, truncate it
     if (fitted < 0) fitted = 0;

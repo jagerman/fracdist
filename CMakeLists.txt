@@ -4,7 +4,7 @@ project(fracdist CXX)
 
 set(fracdist_VMAJ 1)
 set(fracdist_VMIN 0)
-set(fracdist_VPAT 3)
+set(fracdist_VPAT 4)
 set(fracdist_description "fractional unit roots/cointegration pvalue and critical value finder")
 set(fracdist_author "Jason Rhinelander <jason@imaginary.ca>")
 set(fracdist_homepage "https://github.com/jagerman/fracdist")

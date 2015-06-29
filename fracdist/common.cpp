@@ -1,14 +1,9 @@
 #include <fracdist/common.hpp>
 #include <boost/math/distributions/chi_squared.hpp>
 #include <Eigen/Core>
-#include <Eigen/Cholesky>
+#include <Eigen/SVD>
 
-using Eigen::MatrixX3d;
-using Eigen::Matrix3Xd;
-using Eigen::Matrix3d;
-using Eigen::VectorXd;
-using Eigen::RowVector3d;
-using Eigen::LLT;
+using namespace Eigen;
 
 namespace fracdist {
 
@@ -125,9 +120,8 @@ const std::array<double, p_length> quantiles(const unsigned int &q, const double
         // The interpolated F' is then the fitted value from the regression evaluted at the desired
         // b.
 
-        // The regressors don't change, so calculate the X and cholesky decomposition of XtX
-        // matrices just once:
-        
+        // The regressors don't change, so calculate the X and SVD decomposition just once:
+
         MatrixX3d X(blast-bfirst+1, 3);
         for (size_t i = bfirst; i <= blast; i++) {
             X(i-bfirst, 0) = bweights[i];
@@ -135,8 +129,7 @@ const std::array<double, p_length> quantiles(const unsigned int &q, const double
             X(i-bfirst, 2) = bweights[i] * bvalues[i] * bvalues[i];
         }
 
-        Matrix3Xd Xt = X.transpose();
-        LLT<Matrix3d> cholXtX(Xt * X);
+        JacobiSVD<MatrixXd> svd(X, ComputeThinU | ComputeThinV);
 
         RowVector3d wantx;
         wantx(0) = 1.0;
@@ -152,7 +145,7 @@ const std::array<double, p_length> quantiles(const unsigned int &q, const double
                 y(j-bfirst) = bweights[j] * bmap[j][i];
             }
 
-            result[i] = wantx * cholXtX.solve(Xt * y);
+            result[i] = wantx * svd.solve(y);
         }
 
         qcache_store(q, b, constant, interp, result);
