@@ -93,13 +93,17 @@ add_custom_target(data DEPENDS ${fracdist_data_generated})
 configure_file("${CMAKE_SOURCE_DIR}/fracdist/version.cpp.in" "${CMAKE_BINARY_DIR}/fracdist/version.cpp")
 list(APPEND fracdist_source "${CMAKE_BINARY_DIR}/fracdist/version.cpp")
 
+option(EIGEN_FORCE_LOCAL "Force use of local copy of Eigen" OFF)
 # Try to find Eigen3 on the system first; if that fails, use the included copy
-find_package(Eigen3)
+if (NOT EIGEN_FORCE_LOCAL)
+    find_package(Eigen3)
+endif()
 if (NOT EIGEN3_FOUND)
     message(STATUS "Eigen3 not found on system; using bundled copy")
     set(EIGEN3_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/eigen3")
     find_package(Eigen3 REQUIRED)
 endif()
+message(STATUS "Eigen version: ${EIGEN3_VERSION}")
 include_directories(${EIGEN3_INCLUDE_DIR})
 
 # Try to find Boost on the system first; if that fails, use the included boost subset
