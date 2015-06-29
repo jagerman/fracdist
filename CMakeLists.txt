@@ -106,8 +106,11 @@ endif()
 message(STATUS "Eigen version: ${EIGEN3_VERSION}")
 include_directories(${EIGEN3_INCLUDE_DIR})
 
+option(BOOST_FORCE_LOCAL "Force use of local copy of Boost" OFF)
 # Try to find Boost on the system first; if that fails, use the included boost subset
-find_package(Boost)
+if (NOT BOOST_FORCE_LOCAL)
+    find_package(Boost)
+endif()
 if (NOT Boost_FOUND)
     message(STATUS "Boost not found on system; using bundled copy")
     set(Boost_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/boost")
