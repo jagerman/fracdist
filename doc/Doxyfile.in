@@ -36,8 +36,7 @@ HAVE_DOT               = YES
 DOT_IMAGE_FORMAT       = svg
 
 USE_MATHJAX            = YES
-# Use default (cdn-hosted) MathJax
-#MATHJAX_RELPATH        =
+MATHJAX_RELPATH        = @mathjax_usable_path@
 
 CLASS_GRAPH            = YES
 COLLABORATION_GRAPH    = YES
