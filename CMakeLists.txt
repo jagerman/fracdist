@@ -12,19 +12,26 @@ set(fracdist_homepage "https://github.com/jagerman/fracdist")
 cmake_policy(SET CMP0046 OLD)
 cmake_policy(SET CMP0042 NEW)
 
-# libfracdist library version (CURRENT.AGE.REVISION), which is totally separate
-# from the above.
-# CURRENT gets incremented for an incompatible interface change
-# AGE gets incremented for compatible-preserving interface changes/additions
-# REVISION gets incremented for code changes without interface changes
+# fracdist library version (CURRENT.REVISION.AGE), which is totally separate
+# from the above.  See http://www.gnu.org/software/libtool/manual/html_node/Updating-version-info.html
+# Basic rules for updating these when releasing a new fracdist version:
+# - If the new release has an API change:
+#   - CURRENT gets updated
+#   - REVISION gets set to 0
+#   - If the API change was purely an addition, increment AGE
+#   - Otherwise (i.e. an API change or removal), reset AGE to 0
+# - Otherwise, if the release has no API change but has code changes:
+#   - REVISION gets incremented
+#   - (CURRENT and AGE stay the same)
+# If there is no code change (e.g. the release is just a documentation update)
+# then none of these change.
+#
+# (So something like 3.7.1 indicates the 8th revision of the libfracdist.so.3
+# interface, and that code that links against libfracdist.so.2 can safely link
+# against this version, but code that links against libfracdist.so.1 cannot.
 set(libfracdist_CURRENT  "0")
 set(libfracdist_AGE      "0")
 set(libfracdist_REVISION "0")
-
-# The versions for the .so file; changes needed only for ABI-incompatible changes.
-set(libfracdist_so_VMAJ 1)
-set(libfracdist_so_VMIN 0)
-set(libfracdist_so_VPAT 0)
 
 set(fracdist_data_zip_basename mn-files.zip)
 set(fracdist_data_zip "${CMAKE_CURRENT_BINARY_DIR}/data/${fracdist_data_zip_basename}")
