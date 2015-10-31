@@ -18,11 +18,30 @@ test statistic values from p-values.  Running each program without arguments
 gives usage information for the programs.
 
 The latest version of the source code of this library is available at
-https://github.com/jagerman/fracdist.  Binary releases are available at
-https://github.com/jagerman/fracdist/releases.
+https://github.com/jagerman/fracdist.
 
-A generated version of the library API (which may be out of date) is available
-at https://imaginary.ca/fracdist-api/.
+## Installation
+
+### Debian, Ubuntu, and other Debian-derived Linux distributions
+
+Binary releases are available at https://github.com/jagerman/fracdist/releases.
+An apt repository containing the latest release for Debian-derived
+distributions is available by adding one of the following lines to
+/etc/apt/sources.list:
+
+    deb https://imaginary.ca/debian sid main
+
+    deb https://imaginary.ca/debian jessie main
+
+You may need to first install the apt-transport-https package; the repository
+is signed: the key can be installed to authenticate packages using the command:
+
+    curl -s https://imaginary.ca/public.gpg | sudo apt-key add -
+
+### Other operating systems
+
+Binary releases for other systems (Windows, OS X) are available from
+https://github.com/jagerman/fracdist/releases.
 
 ## Requirements
 
@@ -61,4 +80,4 @@ See [CHANGELOG.md](CHANGELOG.md).
 
 ## Copyright
 
-© 2014 Jason Rhinelander <jason@imaginary.ca>
+© 2014-2015 Jason Rhinelander <jason@imaginary.ca>

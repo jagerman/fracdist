@@ -9,11 +9,21 @@ supporting the C++11 standard (recent versions of clang and g++ will certainly
 work).
 
 Compiling also *optionally* requires `doxygen` and `dot` (from the `graphviz`
-package) for generating API HTML documentation (the documentation won't be
-generated if .  Additionally, if the system has an installation of the Eigen3
-and boost headers they will be used; if not, internal copies of the required
-headers will be used.  If you want to generate the Windows installer, you'll
-also need the `nsis` package to be installed.
+package) for generating API HTML documentation--the documentation won't be
+generated if the packages are not installed.  Additionally, if the system has
+an installation of the Eigen3 and boost headers they will be used; if not,
+internal copies of the required headers will be used.  If you want to generate
+the Windows installer, you'll also need the `nsis` package to be installed.
+
+## Compiling on a debian-derived system
+
+The easiest way to compile and generate debs on a Debian-derived system is to
+use the "debian" branch of the repository, which contains the debian packaging
+files.  From this branch you can use:
+
+    dpkg-buildpackage -uc -us -b
+
+to generate the .debs.
 
 ## Linux, OS X, and similar
 
@@ -22,26 +32,11 @@ To compile on a unix-like system, from the fracdist directory do:
     mkdir build
     cd build
     cmake ..
-    make -j4
+    make
 
 You can install directly to the system (usually under /usr/local) using:
 
     make install
-
-or alternatively build a .deb and .rpm package to install using one of:
-
-    cpack -G DEB
-    cpack -G RPM
-
-followed by an appropriate package command to install the package (for example,
-on Debian/Ubuntu: dpkg -i fracdist-x.y.z-amd64.deb).
-
-You can also use either of:
-
-    make package
-    cpack
-
-to build both the .deb and .rpm.
 
 ## Windows executables (built on a Linux system using mingw)
 
