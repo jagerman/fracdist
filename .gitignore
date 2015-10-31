@@ -4,6 +4,9 @@
 .*.swo
 .swo
 
+# youcompleteme compiled file
+.ycm_extra_conf.pyc
+
 # Build files
 /build/
 /build[0-9]/
