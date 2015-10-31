@@ -35,10 +35,8 @@ set(libfracdist_CURRENT  "0")
 set(libfracdist_AGE      "0")
 set(libfracdist_REVISION "0")
 
-set(fracdist_data_zip_basename mn-files.zip)
-set(fracdist_data_zip "${CMAKE_CURRENT_BINARY_DIR}/data/${fracdist_data_zip_basename}")
-set(fracdist_data_url "http://qed.econ.queensu.ca/jae/datasets/mackinnon004/${fracdist_data_zip_basename}")
 set(fracdist_data_generated "${CMAKE_BINARY_DIR}/fracdist/data.cpp" "${CMAKE_BINARY_DIR}/fracdist/data.hpp")
+file(GLOB fracdist_datafiles RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} data/*.txt)
 
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/Modules)
 find_package(Perl REQUIRED)
@@ -58,31 +56,6 @@ if (MINGW)
     add_definitions(-DBOOST_DISABLE_THREADS)
 endif()
 
-message(STATUS "Downloading ${fracdist_data_url}...")
-file(DOWNLOAD "${fracdist_data_url}" "${fracdist_data_zip}" STATUS zipdl_stat)
-
-list(GET zipdl_stat 0 errcode)
-if (errcode)
-    list(GET zipdl_stat 1 errmsg)
-    message(FATAL_ERROR "Unable to download data files from ${fracdist_data_url}: ${errmsg}")
-endif()
-message(STATUS "${fracdist_data_zip} downloaded.")
-
-foreach(type c m)
-    foreach (n RANGE 1 12)
-        if (n LESS 10)
-            set(n "0${n}")
-        endif()
-        list(APPEND fracdist_datafiles "${CMAKE_CURRENT_BINARY_DIR}/data/fr${type}app${n}.txt")
-    endforeach()
-endforeach()
-
-add_custom_command(OUTPUT ${fracdist_datafiles}
-    COMMAND ${CMAKE_COMMAND} -E tar xf "${fracdist_data_zip}"
-    COMMAND ${CMAKE_COMMAND} -E remove "${CMAKE_CURRENT_BINARY_DIR}/data/fracdist.f" "${CMAKE_CURRENT_BINARY_DIR}/data/fracdist.f-win"
-    WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/data"
-    COMMENT "Extracting data/frcapp*.txt, frmapp*.txt from ${fracdist_data_zip_basename}")
-
 foreach(hpp fracdist/common.hpp fracdist/pvalue.hpp fracdist/critical.hpp fracdist/version.hpp)
     list(APPEND fracdist_headers "${CMAKE_CURRENT_SOURCE_DIR}/${hpp}")
 endforeach()
@@ -93,7 +66,7 @@ endforeach()
 set(fracdist_programs fdpval fdcrit)
 
 add_custom_command(OUTPUT ${fracdist_data_generated}
-    COMMAND ${PERL_EXECUTABLE} "-I${CMAKE_SOURCE_DIR}" "${CMAKE_SOURCE_DIR}/build-data.pl" "${CMAKE_BINARY_DIR}/data"
+    COMMAND ${PERL_EXECUTABLE} "-I${CMAKE_SOURCE_DIR}" "${CMAKE_SOURCE_DIR}/build-data.pl" "${CMAKE_SOURCE_DIR}/data"
     DEPENDS build-data.pl DataParser.pm ${fracdist_datafiles}
     COMMENT "Generating fracdist/data.{cpp,hpp} from data/*.txt"
 )
