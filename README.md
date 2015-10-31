@@ -66,6 +66,14 @@ PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with
 this program.  If not, see <http://www.gnu.org/licenses/>.
 
+Note that this project uses data from
+http://qed.econ.queensu.ca/jae/datasets/mackinnon004/, which requests the
+following citation if the results are used in academic papers:
+
+James G. MacKinnon and Morten Ø. Nielsen, "Numerical Distribution Functions of
+Fractional Unit Root and Cointegration Tests," Journal of Applied Econometrics,
+Vol. 29, No. 1, 2014, pp. 161-171.
+
 ## Compiling
 
 See [BUILDING.md](BUILDING.md).
