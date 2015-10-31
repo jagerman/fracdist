@@ -10,11 +10,11 @@ endif()
 # case the default (MathJax via public CDN) will be used by doxygen.
 set(mathjax_usable_path "")
 if (MATHJAX_PATH)
-    set(mathjax_usable_path "${MATHJAX_PATH}")
+    set(mathjax_usable_path "MATHJAX_RELPATH = ${MATHJAX_PATH}")
 elseif (NOT NO_MATHJAX)
     find_package(MathJax 2.3)
     if(MATHJAX_FOUND)
-        set(mathjax_usable_path "${MATHJAX_PATH}")
+        set(mathjax_usable_path "MATHJAX_RELPATH = ${MATHJAX_PATH}")
     else()
         message(STATUS "System MathJax not found: using public MathJax CDN instead.  If MathJax is installed, try setting MATHJAX_ROOT")
     endif()
@@ -41,5 +41,5 @@ set_property(DIRECTORY APPEND PROPERTY
 add_dependencies(api_doc ${fracdist_data_generated})
 
 install(DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/api"
-    DESTINATION ${CMAKE_INSTALL_DOCDIR}
+    DESTINATION ${fracdist_docdir}
     COMPONENT docs)

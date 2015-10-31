@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 2.8)
 
 project(fracdist CXX)
 
+include(GNUInstallDirs)
+
 set(fracdist_VMAJ 1)
 set(fracdist_VMIN 0)
 set(fracdist_VPAT 4)
@@ -152,7 +154,7 @@ endif()
 if (CMAKE_SYSTEM_NAME STREQUAL Windows)
     set(fracdist_docdir "doc")
 else()
-    set(fracdist_docdir "share/doc/fracdist")
+    set(fracdist_docdir "${CMAKE_INSTALL_DOCDIR}")
 endif()
 
 if (DEFINED fracdist_PACKAGE_DOCS)
