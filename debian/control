@@ -1,0 +1,89 @@
+Source: fracdist
+Section: science
+Maintainer: Jason Rhinelander <jason@imaginary.ca>
+Homepage: https://git.imaginary.ca/eris/creativity
+Priority: optional
+Standards-Version: 3.9.6
+Build-Depends: debhelper (>= 9),
+               cmake,
+               libeigen3-dev (>= 3.2.2),
+               libboost-dev,
+               doxygen,
+               graphviz
+
+Package: libfracdist0
+Section: libs
+Architecture: any
+Multi-Arch: same
+Pre-Depends: ${misc:Pre-Depends}
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: Fractional unit root and cointegration p-value and critical value calculator
+ fracdist calculates p-value and critical values of fractional unit root and
+ cointegrated variabels.  The program is modelled on the description in James
+ G. MacKinnon and Morten Ørregaard Nielsen, "Numerical Distribution Functions
+ of Fractional Unit Root and Cointegration Tests," Journal of Applied
+ Econometrics, Vol. 29, No. 1, 2014, pp.161-171. The data from the data archive
+ associated with the paper,
+ http://qed.econ.queensu.ca/jae/datasets/mackinnon004/, is included in this
+ software.  That data requests citation of the above paper if the results are
+ used in other academic papers.
+ .
+ This package contains the shared library.
+
+Package: libfracdist-dev
+Section: libdevel
+Architecture: any
+Multi-Arch: same
+Depends: libfracdist0 (= ${binary:Version}), ${misc:Depends}
+Suggests: fracdist-doc
+Description: Fractional unit root and cointegration p-value and critical value calculator
+ fracdist calculates p-value and critical values of fractional unit root and
+ cointegrated variabels.  The program is modelled on the description in James
+ G. MacKinnon and Morten Ørregaard Nielsen, "Numerical Distribution Functions
+ of Fractional Unit Root and Cointegration Tests," Journal of Applied
+ Econometrics, Vol. 29, No. 1, 2014, pp.161-171. The data from the data archive
+ associated with the paper,
+ http://qed.econ.queensu.ca/jae/datasets/mackinnon004/, is included in this
+ software.  That data requests citation of the above paper if the results are
+ used in other academic papers.
+ .
+ This package contains the headers needed to compile code using the shared library.
+
+Package: fracdist
+Section: science
+Architecture: any
+Multi-Arch: same
+Pre-Depends: ${misc:Pre-Depends}
+Depends: libfracdist0 (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
+Description: Fractional unit root and cointegration p-value and critical value calculator
+ fracdist calculates p-value and critical values of fractional unit root and
+ cointegrated variabels.  The program is modelled on the description in James
+ G. MacKinnon and Morten Ørregaard Nielsen, "Numerical Distribution Functions
+ of Fractional Unit Root and Cointegration Tests," Journal of Applied
+ Econometrics, Vol. 29, No. 1, 2014, pp.161-171. The data from the data archive
+ associated with the paper,
+ http://qed.econ.queensu.ca/jae/datasets/mackinnon004/, is included in this
+ software.  That data requests citation of the above paper if the results are
+ used in other academic papers.
+ .
+ This package contains the command-line interface programs:
+ .
+ fdpval -- calculates pvalues associated with critical values
+ fdcrit -- calculates critical values associated with pvalues
+
+Package: fracdist-doc
+Section: doc
+Architecture: all
+Depends: libjs-mathjax, ${misc:Depends}
+Description: Fractional unit root and cointegration p-value and critical value calculator
+ fracdist calculates p-value and critical values of fractional unit root and
+ cointegrated variabels.  The program is modelled on the description in James
+ G. MacKinnon and Morten Ørregaard Nielsen, "Numerical Distribution Functions
+ of Fractional Unit Root and Cointegration Tests," Journal of Applied
+ Econometrics, Vol. 29, No. 1, 2014, pp.161-171. The data from the data archive
+ associated with the paper,
+ http://qed.econ.queensu.ca/jae/datasets/mackinnon004/, is included in this
+ software.  That data requests citation of the above paper if the results are
+ used in other academic papers.
+ .
+ This package contains the HTML API documentation.
