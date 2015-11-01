@@ -135,65 +135,49 @@ if (DEFINED fracdist_PACKAGE_DOCS)
 endif()
 
 
-set(CPACK_PACKAGE_VERSION_MAJOR ${fracdist_VMAJ})
-set(CPACK_PACKAGE_VERSION_MINOR ${fracdist_VMIN})
-set(CPACK_PACKAGE_VERSION_PATCH ${fracdist_VPAT})
-
-set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_SOURCE_DIR}/LICENSE")
-
-
-install(FILES ${fracdist_headers} DESTINATION include/fracdist COMPONENT headers)
-
-install(FILES README.md CHANGELOG.md DESTINATION "${fracdist_docdir}" COMPONENT docs)
-
+set(use_cpack OFF)
 if (CMAKE_SYSTEM_NAME STREQUAL Windows)
-    # Windows binaries and lib go in the top-level dir:
-    install(TARGETS ${fracdist_programs} COMPONENT binaries DESTINATION .)
-    install(TARGETS fracdist COMPONENT library DESTINATION .)
-
     set(CPACK_GENERATOR ZIP NSIS)
     set(CPACK_PACKAGE_FILE_NAME "fracdist-${fracdist_VMAJ}.${fracdist_VMIN}.${fracdist_VPAT}-windows")
+    set(use_cpack ON)
 elseif(CMAKE_SYSTEM_NAME STREQUAL Darwin)
-    # This is a bit gross, but basically we'll just stick the binaries/so in the top-level:
-    install(TARGETS ${fracdist_programs} COMPONENT binaries DESTINATION .)
-    install(TARGETS fracdist COMPONENT library DESTINATION .)
     set(CPACK_GENERATOR ZIP)
     set(CPACK_PACKAGE_FILE_NAME "fracdist-${fracdist_VMAJ}.${fracdist_VMIN}.${fracdist_VPAT}-macosx")
+    set(use_cpack ON)
 else()
-    install(TARGETS fracdist COMPONENT library DESTINATION lib)
-    install(TARGETS ${fracdist_programs} COMPONENT binaries DESTINATION bin)
+    install(TARGETS fracdist COMPONENT library DESTINATION "${CMAKE_INSTALL_LIBDIR}")
+    install(TARGETS ${fracdist_programs} COMPONENT binaries DESTINATION "${CMAKE_INSTALL_BINDIR}")
+    install(DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/fracdist/"
+        DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/fracdist/"
+        FILES_MATCHING PATTERN "*.hpp" PATTERN "*.h")
+    install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/fracdist/"
+        DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/fracdist/"
+        FILES_MATCHING PATTERN "*.hpp" PATTERN "*.h")
 
-    set(CPACK_GENERATOR DEB RPM)
-
-    set(arch ${CMAKE_HOST_SYSTEM_PROCESSOR})
-    if (arch STREQUAL x86_64)
-        # Check that we aren't using a 32-bit userspace
-        execute_process(COMMAND perl -MConfig -e "print \$Config{longsize}" OUTPUT_VARIABLE longsize)
-        if (longsize EQUAL 4)
-            set(arch i386)
-        else()
-            set(arch amd64)
-        endif()
-    elseif(arch STREQUAL x86)
-        set(arch i386)
-    elseif(arch MATCHES "i[3-6]86")
-        set(arch i386)
-    endif()
-    message(STATUS "arch = ${arch}")
-
-    set(CPACK_PACKAGE_FILE_NAME "fracdist-${fracdist_VMAJ}.${fracdist_VMIN}.${fracdist_VPAT}-${arch}")
-    set(CPACK_DEBIAN_PACKAGE_MAINTAINER "${fracdist_author}")
-    #set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
-    set(CPACK_DEBIAN_PACKAGE_HOMEPAGE "${fracdist_homepage}")
-    set(CPACK_DEBIAN_PACKAGE_DESCRIPTION "${fracdist_description}")
+    install(FILES README.md LICENSE CHANGELOG.md DESTINATION "${CMAKE_INSTALL_DOCDIR}")
 endif()
 
-set(CPACK_COMPONENTS_GROUPING ALL_COMPONENTS_IN_ONE)
+if (use_cpack)
+    # Sticking the binaries/so in the top-level is the norm on Windows, and a
+    # bit gross on OS X, but it's a basic hack that works.
+    install(TARGETS ${fracdist_programs} COMPONENT binaries DESTINATION .)
+    install(TARGETS fracdist COMPONENT library DESTINATION .)
+    install(FILES ${fracdist_headers} DESTINATION include/fracdist COMPONENT headers)
+    install(FILES README.md CHANGELOG.md DESTINATION "${fracdist_docdir}" COMPONENT docs)
 
-include(CPack)
+    set(CPACK_PACKAGE_VERSION_MAJOR ${fracdist_VMAJ})
+    set(CPACK_PACKAGE_VERSION_MINOR ${fracdist_VMIN})
+    set(CPACK_PACKAGE_VERSION_PATCH ${fracdist_VPAT})
 
-cpack_add_component(library REQUIRED DISPLAY_NAME "libfracdist" DESCRIPTION "The main fracdist library code.")
-cpack_add_component(binaries DISPLAY_NAME "Binaries" DESCRIPTION "'fdpval' and 'fdcrit' provide a simple command-line interface to libfracdist functionality.")
-cpack_add_component(headers DISABLED DISPLAY_NAME "C++ headers" DESCRIPTION "C++ headers needed to compile code linking to libfracdist.")
-cpack_add_component(docs DISABLED DISPLAY_NAME "Documentation" DESCRIPTION "API documentation for libfracdist programming.")
+    set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_SOURCE_DIR}/LICENSE")
+
+    include(CPack)
+
+    cpack_add_component(library REQUIRED DISPLAY_NAME "libfracdist" DESCRIPTION "The main fracdist library code.")
+    cpack_add_component(binaries DISPLAY_NAME "Binaries" DESCRIPTION "'fdpval' and 'fdcrit' provide a simple command-line interface to libfracdist functionality.")
+    cpack_add_component(headers DISABLED DISPLAY_NAME "C++ headers" DESCRIPTION "C++ headers needed to compile code linking to libfracdist.")
+    cpack_add_component(docs DISABLED DISPLAY_NAME "Documentation" DESCRIPTION "API documentation for libfracdist programming.")
+
+    set(CPACK_COMPONENTS_GROUPING ALL_COMPONENTS_IN_ONE)
+endif()
 
