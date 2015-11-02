@@ -1,5 +1,5 @@
-fracdist (1.0.5-1~wily1) wily; urgency=medium
+fracdist (1.0.5-1~trusty1) trusty; urgency=medium
 
-  * Initial release, Ubuntu wily.
+  * Initial release, Ubuntu trusty.
 
  -- Jason Rhinelander <jason@imaginary.ca>  Sat, 31 Oct 2015 18:47:11 -0400

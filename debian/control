@@ -6,7 +6,7 @@ Priority: optional
 Standards-Version: 3.9.6
 Build-Depends: debhelper (>= 9),
                cmake,
-               libeigen3-dev (>= 3.2.2),
+               libeigen3-dev (>= 3.2.0),
                libboost-dev,
                doxygen,
                graphviz
