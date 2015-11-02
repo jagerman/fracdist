@@ -11,9 +11,6 @@ set(fracdist_description "fractional unit roots/cointegration pvalue and critica
 set(fracdist_author "Jason Rhinelander <jason@imaginary.ca>")
 set(fracdist_homepage "https://github.com/jagerman/fracdist")
 
-cmake_policy(SET CMP0046 OLD)
-cmake_policy(SET CMP0042 NEW)
-
 # fracdist library version (CURRENT.REVISION.AGE), which is totally separate
 # from the above.  See http://www.gnu.org/software/libtool/manual/html_node/Updating-version-info.html
 # Basic rules for updating these when releasing a new fracdist version:
